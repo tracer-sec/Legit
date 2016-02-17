@@ -12,3 +12,10 @@ wstring Utils::FindAndReplace(wstring src, wstring match, wstring replacement)
     }
     return src;
 }
+
+string Utils::Trim(string s)
+{
+    s = s.substr(s.find_first_not_of(" \n\r\t"));
+    s.erase(s.find_last_not_of(" \n\r\t") + 1);
+    return s;
+}
