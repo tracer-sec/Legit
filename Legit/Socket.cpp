@@ -65,7 +65,7 @@ Socket::Socket(string host, string service, unsigned short timeout)
 
 Socket::~Socket()
 {
-    closesocket(socket_);
+    ::closesocket(socket_);
 }
 
 int Socket::Send(const char *buffer, size_t length)

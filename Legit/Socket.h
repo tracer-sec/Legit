@@ -12,12 +12,12 @@ class Socket
 {
 public:
     Socket(std::string host, std::string service, unsigned short timeout = 0);
-    ~Socket();
+    virtual ~Socket();
 
-    int Send(const char *buffer, size_t length);
-    int Send(std::string s);
-    int Receive(char *buffer, size_t length);
-    void Close();
+    virtual int Send(const char *buffer, size_t length);
+    virtual int Send(std::string s);
+    virtual int Receive(char *buffer, size_t length);
+    virtual void Close();
 
     std::string ToString() { return name_; }
     std::string GetError() { return error_; }
@@ -25,9 +25,11 @@ public:
     static bool StartUp();
     static bool Shutdown();
 
+protected:
+    std::string error_;
+
 private:
     static bool initialised_;
     SOCKET socket_;
     std::string name_;
-    std::string error_;
 };
