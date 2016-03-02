@@ -22,6 +22,9 @@ public:
     HttpResponse Put(const std::string &url, const std::string &body, const std::string &encoding);
     HttpResponse Delete(const std::string &url);
 
+    void AddHeader(std::string key, std::string value);
+    void RemoveHeader(std::string key);
+
 private:
     HttpResponse SendRequest(std::string request);
     HttpResponse ParseResponse();
@@ -32,4 +35,5 @@ private:
     sockaddr_in address_;
     Socket socket_;
     std::string remains_;
+    std::unordered_map<std::string, std::string> headers_;
 };

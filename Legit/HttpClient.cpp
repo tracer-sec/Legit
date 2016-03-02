@@ -117,6 +117,8 @@ HttpResponse HttpClient::Get(const string &url)
     ss << "GET " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
     ss << "User-Agent: " << USER_AGENT << "\r\n";
+    for (auto h : headers_)
+        ss << h.first << ": " << h.second << "\r\n";
     ss << "\r\n";
 
     return SendRequest(ss.str());
@@ -128,6 +130,8 @@ HttpResponse HttpClient::Post(const string &url, const string &body, const strin
     ss << "POST " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
     ss << "User-Agent: " << USER_AGENT << "\r\n";
+    for (auto h : headers_)
+        ss << h.first << ": " << h.second << "\r\n";
     ss << "Content-Length: " << body.length() << "\r\n";
     ss << "Content-Type: " << encoding << "\r\n";
     ss << "\r\n";
@@ -143,6 +147,8 @@ HttpResponse HttpClient::Put(const string &url, const string &body, const string
     ss << "PUT " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
     ss << "User-Agent: " << USER_AGENT << "\r\n";
+    for (auto h : headers_)
+        ss << h.first << ": " << h.second << "\r\n";
     ss << "Content-Length: " << body.length() << "\r\n";
     ss << "Content-Type: " << encoding << "\r\n";
     ss << "\r\n";
@@ -158,7 +164,19 @@ HttpResponse HttpClient::Delete(const string &url)
     ss << "DELETE " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
     ss << "User-Agent: " << USER_AGENT << "\r\n";
+    for (auto h : headers_)
+        ss << h.first << ": " << h.second << "\r\n";
     ss << "\r\n";
 
     return SendRequest(ss.str());
+}
+
+void HttpClient::AddHeader(string key, string value)
+{
+    headers_[key] = value;
+}
+
+void HttpClient::RemoveHeader(string key)
+{
+    headers_.erase(key);
 }
