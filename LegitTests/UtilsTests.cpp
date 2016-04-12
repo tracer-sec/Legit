@@ -53,4 +53,16 @@ TEST_CASE("basic hex test 2")
     REQUIRE(result == "12345678");
 }
 
+TEST_CASE("string join")
+{
+    vector<string> tokens = { "put", "your", "tokens", "here" };
+    auto result = Utils::Join(" ", tokens);
+    REQUIRE(result == "put your tokens here");
+}
 
+TEST_CASE("string join with single element")
+{
+    vector<string> tokens = { "derp" };
+    auto result = Utils::Join(" ", tokens);
+    REQUIRE(result == "derp");
+}

@@ -68,9 +68,9 @@ string Utils::Join(string seperator, vector<string> stringList)
         if (!first)
         {
             ss << seperator;
-            first = false;
         }
         ss << s;
+        first = false;
     }
 
     return ss.str();
