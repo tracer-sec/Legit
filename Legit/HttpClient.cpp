@@ -1,5 +1,5 @@
-#include "HttpClient.h"
-#include "Utils.h"
+#include "HttpClient.hpp"
+#include "Utils.hpp"
 
 #include <Ws2tcpip.h>
 #include <sstream>

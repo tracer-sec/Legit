@@ -1,4 +1,4 @@
-#include "RegistryEntry.h"
+#include "RegistryEntry.hpp"
 
 using namespace std;
 

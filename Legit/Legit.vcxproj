@@ -99,11 +99,11 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileSystem.h" />
-    <ClInclude Include="HttpClient.h" />
-    <ClInclude Include="Random.h" />
-    <ClInclude Include="RegistryEntry.h" />
-    <ClInclude Include="Socket.h" />
+    <ClInclude Include="FileSystem.hpp" />
+    <ClInclude Include="HttpClient.hpp" />
+    <ClInclude Include="Random.hpp" />
+    <ClInclude Include="RegistryEntry.hpp" />
+    <ClInclude Include="Socket.hpp" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Utils.h"
+#include "Utils.hpp"
 
 using namespace std;
 
