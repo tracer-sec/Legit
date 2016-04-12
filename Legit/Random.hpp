@@ -2,6 +2,9 @@
 
 #include <random>
 
+namespace Legit
+{
+
 static const std::string ALPHA = "abcdefghijklmnopqrstuvwxyz";
 static const std::string ALPHA_MIXED = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const std::string ALPHA_NUMERIC = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -22,3 +25,5 @@ public:
 private:
     std::mt19937 engine_;
 };
+
+} // end namespace

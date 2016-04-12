@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+namespace Legit
+{
+
 namespace FileSystem
 {
     std::vector<std::wstring> GetSubdirectories(std::wstring path);
@@ -11,3 +14,5 @@ namespace FileSystem
     bool FileExists(std::wstring path);
     bool DirectoryExists(std::wstring path);
 }
+
+} // end namespace

@@ -1,6 +1,8 @@
 #include "catch.hpp"
 #include "Random.hpp"
 
+using namespace Legit;
+
 TEST_CASE("random seed test")
 {
     auto r0 = RandomGenerator(100);

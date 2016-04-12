@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+using namespace Legit;
 using namespace std;
 
 bool Socket::initialised_ = false;

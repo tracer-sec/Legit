@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <vector>
 
+using namespace Legit;
 using namespace std;
 
 wstring Utils::FindAndReplace(wstring src, wstring match, wstring replacement)

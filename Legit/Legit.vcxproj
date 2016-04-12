@@ -104,7 +104,7 @@
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RegistryEntry.hpp" />
     <ClInclude Include="Socket.hpp" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

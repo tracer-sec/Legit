@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "Utils.hpp"
 
+using namespace Legit;
 using namespace std;
 
 TEST_CASE("basic string search and replace")

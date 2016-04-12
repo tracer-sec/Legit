@@ -1,5 +1,6 @@
 #include "RegistryEntry.hpp"
 
+using namespace Legit;
 using namespace std;
 
 RegistryEntry::RegistryEntry(HKEY hive, wstring subKey)

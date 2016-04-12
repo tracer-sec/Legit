@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+namespace Legit
+{
+
 class RegistryEntry
 {
 public:
@@ -18,3 +21,5 @@ private:
     HKEY key_;
     long success_;
 };
+
+} // end namespace

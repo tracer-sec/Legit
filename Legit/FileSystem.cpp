@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <Shlwapi.h>
 
+using namespace Legit;
 using namespace std;
 
 vector<wstring> FileSystem::GetSubdirectories(wstring path)

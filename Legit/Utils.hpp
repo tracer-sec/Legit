@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+namespace Legit
+{
+
 namespace Utils
 {
     std::wstring FindAndReplace(std::wstring src, std::wstring match, std::wstring replacement);
@@ -12,3 +15,5 @@ namespace Utils
     std::string FriendlySize(size_t length);
     std::string Join(std::string seperator, std::vector<std::string> stringList);
 }
+
+} // end namespace

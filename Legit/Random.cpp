@@ -1,5 +1,6 @@
 #include "Random.hpp"
 
+using namespace Legit;
 using namespace std;
 
 RandomGenerator::RandomGenerator(unsigned long seed)

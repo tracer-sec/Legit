@@ -4,6 +4,7 @@
 #include <Ws2tcpip.h>
 #include <sstream>
 
+using namespace Legit;
 using namespace std;
 
 const string USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0";

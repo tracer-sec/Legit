@@ -8,6 +8,9 @@
 
 #include <string>
 
+namespace Legit
+{
+
 class Socket
 {
 public:
@@ -33,3 +36,5 @@ private:
     SOCKET socket_;
     std::string name_;
 };
+
+} // end namespace

@@ -5,6 +5,9 @@
 #include <string>
 #include <unordered_map>
 
+namespace Legit
+{
+
 struct HttpResponse
 {
     std::string statusCode;
@@ -37,3 +40,5 @@ private:
     std::string remains_;
     std::unordered_map<std::string, std::string> headers_;
 };
+
+} // end namespace
