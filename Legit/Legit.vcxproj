@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="HttpClient.cpp" />
+    <ClCompile Include="IrcClient.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RegistryEntry.cpp" />
     <ClCompile Include="Socket.cpp" />
@@ -101,6 +102,7 @@
   <ItemGroup>
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="HttpClient.hpp" />
+    <ClInclude Include="IrcClient.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RegistryEntry.hpp" />
     <ClInclude Include="Socket.hpp" />
