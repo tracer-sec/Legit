@@ -18,25 +18,42 @@ std::string IrcMessage::GetReturnName()
         return "";
 }
 
-IrcClient::IrcClient(string host, string port, string nick) 
-    : socket_(host, port)
+IrcClient::IrcClient(unique_ptr<Socket> s, string nick) :
+    socket_(move(s)),
+    receivedFirstPing_(false)
+{
+    // Perform handshake
+    ostringstream ss;
+
+    ss << "NICK " << nick << "\r\n";
+    socket_->Send(ss.str());
+    ss.clear();
+
+    ss << "USER " << nick << " localhost servername " << nick << "\r\n";
+    socket_->Send(ss.str());
+    ss.clear();
+}
+
+IrcClient::IrcClient(string host, string port, string nick) :
+    socket_(make_unique<Socket>(host, port)),
+    receivedFirstPing_(false)
 {
     // Perform handshake
     ostringstream ss;
     
     ss << "NICK " << nick << "\r\n";
-    socket_.Send(ss.str());
+    socket_->Send(ss.str());
     ss.clear();
 
     ss << "USER " << nick << " localhost servername " << nick << "\r\n";
-    socket_.Send(ss.str());
+    socket_->Send(ss.str());
     ss.clear();
 }
 
 void IrcClient::Send(string message)
 {
     // build in flood protection
-    socket_.Send(message);
+    socket_->Send(message);
 }
 
 IrcMessage IrcClient::Receive()
@@ -46,7 +63,7 @@ IrcMessage IrcClient::Receive()
     {
         char buffer[4096];
         memset(buffer, 0, sizeof(buffer));
-        socket_.Receive(buffer, sizeof(buffer));
+        socket_->Receive(buffer, sizeof(buffer));
         remains_.append(buffer);
         endline = remains_.find("\r\n");
     }
@@ -62,6 +79,7 @@ IrcMessage IrcClient::Receive()
         ss << "PONG " << result.substr(5) << "\r\n";
         Send(ss.str());
         result = "";
+        receivedFirstPing_ = true;
     }
 
     return ParseMessage(result);
