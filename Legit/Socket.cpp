@@ -30,7 +30,7 @@ Socket::Socket(string host, string service, unsigned short timeout)
     hint.ai_socktype = SOCK_STREAM;
     hint.ai_protocol = IPPROTO_TCP;
     result = ::getaddrinfo(host.c_str(), service.c_str(), &hint, &address);
-    if (result == SOCKET_ERROR)
+    if (result != 0)
     {
         error_ = "Address lookup failed";
         return;

@@ -3,6 +3,12 @@
 using namespace Legit;
 using namespace std;
 
+RandomGenerator::RandomGenerator()
+{
+    random_device r;
+    engine_.seed(r());
+}
+
 RandomGenerator::RandomGenerator(unsigned long seed)
 {
     Reseed(seed);

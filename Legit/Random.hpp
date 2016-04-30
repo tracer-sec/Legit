@@ -13,6 +13,7 @@ static const std::string ALPHA_NUMERIC_MIXED = "abcdefghijklmnopqrstuvwxyzABCDEF
 class RandomGenerator
 {
 public:
+    RandomGenerator();
     RandomGenerator(unsigned long seed);
 
     void Reseed(unsigned long seed);
