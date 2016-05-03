@@ -3,6 +3,7 @@
 
 #include <Ws2tcpip.h>
 #include <sstream>
+#include <cstring> // for memset
 
 using namespace Legit;
 using namespace std;
@@ -56,6 +57,8 @@ HttpResponse HttpClient::ParseResponse()
 
 string HttpClient::ReadBytes(size_t length)
 {
+    // TODO: what if remains.length() > length
+    // TODO: what about binary data? string should be able to handle embedded nulls ...
     char buffer[4096];
     ostringstream ss;
     ss << remains_;

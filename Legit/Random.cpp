@@ -21,19 +21,19 @@ void RandomGenerator::Reseed(unsigned long seed)
 
 int RandomGenerator::GetInt(int min, int max)
 {
-    uniform_int<int> uniform(min, max);
+    uniform_int_distribution<int> uniform(min, max);
     return uniform(engine_);
 }
 
 float RandomGenerator::GetFloat(float min, float max)
 {
-    uniform_real<float> uniform(min, max);
+    uniform_real_distribution<float> uniform(min, max);
     return uniform(engine_);
 }
 
 double RandomGenerator::GetDouble(double min, double max)
 {
-    uniform_real<double> uniform(min, max);
+    uniform_real_distribution<double> uniform(min, max);
     return uniform(engine_);
 }
 

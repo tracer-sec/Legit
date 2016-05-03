@@ -1,6 +1,7 @@
 #include "IrcClient.hpp"
 
 #include <sstream>
+#include <cstring> // for memset
 
 using namespace Legit;
 using namespace std;
