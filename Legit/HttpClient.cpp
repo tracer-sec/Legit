@@ -8,13 +8,18 @@
 using namespace Legit;
 using namespace std;
 
-const string USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:32.0) Gecko/20100101 Firefox/32.0";
-
 HttpClient::HttpClient(const string host) : 
     host_(host),
-    socket_(host, "80")
+    socket_(make_unique<Socket>(host, "80"))
 {
+    headers_["User-Agent"] = "Legit v0";
+}
 
+HttpClient::HttpClient(unique_ptr<Socket> s) :
+    socket_(move(s))
+{
+    host_ = socket_->GetHost();
+    headers_["User-Agent"] = "Legit v0";
 }
 
 HttpResponse HttpClient::ParseResponse()
@@ -67,7 +72,7 @@ string HttpClient::ReadBytes(size_t length)
     while (totalBytes < length)
     {
         memset(buffer, 0, sizeof(buffer));
-        int bytesRead = socket_.Receive(buffer, min(sizeof(buffer), length - totalBytes));
+        int bytesRead = socket_->Receive(buffer, min(sizeof(buffer), length - totalBytes));
         ss << string(buffer, 0, bytesRead);
         totalBytes += bytesRead;
     }
@@ -91,14 +96,14 @@ string HttpClient::ReadUntil(const string &match)
     char buffer[4097];
     ostringstream ss;
     memset(buffer, 0, sizeof(buffer));
-    int bytesRead = socket_.Receive(buffer, sizeof(buffer) - 1);
+    int bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
     char *find = strstr(buffer, match.c_str());
     ss << remains_;
     while (find == nullptr && bytesRead > 0)
     {
         ss << buffer;
         memset(buffer, 0, sizeof(buffer));
-        bytesRead = socket_.Receive(buffer, sizeof(buffer) - 1);
+        bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
     }
     string s = string(buffer, find - buffer);
     ss << s;
@@ -108,7 +113,7 @@ string HttpClient::ReadUntil(const string &match)
 
 HttpResponse HttpClient::SendRequest(string request)
 {
-    int bytesSent = socket_.Send(request.c_str(), request.length());
+    int bytesSent = socket_->Send(request.c_str(), request.length());
 
     HttpResponse response = ParseResponse();
 
@@ -120,7 +125,6 @@ HttpResponse HttpClient::Get(const string &url)
     ostringstream ss;
     ss << "GET " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
-    ss << "User-Agent: " << USER_AGENT << "\r\n";
     for (auto h : headers_)
         ss << h.first << ": " << h.second << "\r\n";
     ss << "\r\n";
@@ -133,7 +137,6 @@ HttpResponse HttpClient::Post(const string &url, const string &body, const strin
     ostringstream ss;
     ss << "POST " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
-    ss << "User-Agent: " << USER_AGENT << "\r\n";
     for (auto h : headers_)
         ss << h.first << ": " << h.second << "\r\n";
     ss << "Content-Length: " << body.length() << "\r\n";
@@ -150,7 +153,6 @@ HttpResponse HttpClient::Put(const string &url, const string &body, const string
     ostringstream ss;
     ss << "PUT " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
-    ss << "User-Agent: " << USER_AGENT << "\r\n";
     for (auto h : headers_)
         ss << h.first << ": " << h.second << "\r\n";
     ss << "Content-Length: " << body.length() << "\r\n";
@@ -167,7 +169,6 @@ HttpResponse HttpClient::Delete(const string &url)
     ostringstream ss;
     ss << "DELETE " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
-    ss << "User-Agent: " << USER_AGENT << "\r\n";
     for (auto h : headers_)
         ss << h.first << ": " << h.second << "\r\n";
     ss << "\r\n";

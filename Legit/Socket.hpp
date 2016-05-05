@@ -24,6 +24,7 @@ public:
 
     std::string ToString() { return name_; }
     std::string GetError() { return error_; }
+    std::string GetHost() { return host_; }
 
     static bool StartUp();
     static bool Shutdown();
@@ -35,6 +36,7 @@ private:
     static bool initialised_;
     SOCKET socket_;
     std::string name_;
+    std::string host_;
 };
 
 } // end namespace
