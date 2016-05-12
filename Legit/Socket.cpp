@@ -1,5 +1,13 @@
 #include "Socket.hpp"
 
+#ifndef _WIN32
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netdb.h>
+    #include <unistd.h>
+    #define SOCKET_ERROR    (-1)
+#endif
+
 #include <sstream>
 #include <cstring> // for memset
 
@@ -56,7 +64,11 @@ Socket::Socket(string host, string service, unsigned short timeout) :
 
     if (timeout > 0)
     {
+        #if _WIN32
         DWORD t = timeout;
+        #else
+        int t = timeout;
+        #endif
         result = ::setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&t), sizeof(t));
         if (result == SOCKET_ERROR)
         {
@@ -68,7 +80,11 @@ Socket::Socket(string host, string service, unsigned short timeout) :
 
 Socket::~Socket()
 {
+    #if _WIN32
     ::closesocket(socket_);
+    #else
+    ::close(socket_);
+    #endif
 }
 
 int Socket::Send(const char *buffer, size_t length)
@@ -88,16 +104,28 @@ int Socket::Receive(char *buffer, size_t length)
 
 void Socket::Close()
 {
+    #if _WIN32
     ::closesocket(socket_);
+    #else
+    ::close(socket_);
+    #endif
 }
 
 bool Socket::StartUp()
 {
+    #ifdef _WIN32
     WSAData wsaData;
     return WSAStartup(MAKEWORD(2, 2), &wsaData) != SOCKET_ERROR;
+    #else
+    return true;
+    #endif
 }
 
 bool Socket::Shutdown()
 {
+    #ifdef _WIN32
     return WSACleanup() != SOCKET_ERROR;
+    #else
+    return true;
+    #endif
 }

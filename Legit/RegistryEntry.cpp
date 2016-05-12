@@ -1,5 +1,7 @@
 #include "RegistryEntry.hpp"
 
+#ifdef _WIN32
+
 using namespace Legit;
 using namespace std;
 
@@ -56,3 +58,6 @@ void RegistryEntry::GetBlobValue(wstring value, vector<unsigned char> &buffer)
         }
     }
 }
+
+#endif
+

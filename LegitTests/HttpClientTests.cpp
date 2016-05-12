@@ -2,12 +2,17 @@
 #include "HttpClient.hpp"
 #include "Mocks.hpp"
 
+#ifndef _WIN32
+#include "Shims.hpp"
+#endif
+
 using namespace Legit;
 using namespace std;
 
 TEST_CASE("HttpClient valid GET request")
 {
     ostringstream sent;
+    //HttpClient client(make_unique<Mocket>("www.google.co.uk", "80", sent, "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\n<html></html>"));
     HttpClient client(make_unique<Mocket>("www.google.co.uk", "80", sent));
     client.Get("/index.html");
 

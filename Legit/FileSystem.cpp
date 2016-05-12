@@ -1,7 +1,9 @@
 #include "FileSystem.hpp"
 
+#ifdef _WIN32
 #include <Windows.h>
 #include <Shlwapi.h>
+#endif
 
 using namespace Legit;
 using namespace std;
@@ -9,6 +11,7 @@ using namespace std;
 vector<wstring> FileSystem::GetSubdirectories(wstring path)
 {
     vector<wstring> result;
+    #ifdef _WIN32
     WIN32_FIND_DATA findData;
 
     if (path[path.length() - 1] != L'\\')
@@ -33,13 +36,14 @@ vector<wstring> FileSystem::GetSubdirectories(wstring path)
     }
 
     ::FindClose(handle);
-
+    #endif
     return result;
 }
 
 vector<wstring> FileSystem::GetFiles(wstring path)
 {
     vector<wstring> result;
+    #ifdef _WIN32
     WIN32_FIND_DATA findData;
     wchar_t buffer[MAX_PATH];
     wstring directory = path.substr(0, path.rfind(L"\\"));
@@ -59,13 +63,14 @@ vector<wstring> FileSystem::GetFiles(wstring path)
     }
 
     ::FindClose(handle);
-
+    #endif
     return result;
 }
 
 vector<wstring> FileSystem::ExpandWildcards(wstring pattern)
 {
     vector<wstring> result;
+    #ifdef _WIN32
     auto wildcard = pattern.find(L"*\\");
     if (wildcard != wstring::npos)
     {
@@ -84,19 +89,26 @@ vector<wstring> FileSystem::ExpandWildcards(wstring pattern)
         // Simple
         result.push_back(pattern);
     }
+    #endif
     return result;
 }
 
 bool FileSystem::FileExists(wstring path)
 {
+    #ifdef _WIN32
     DWORD fileData = ::GetFileAttributes(path.c_str());
     return (fileData != INVALID_FILE_ATTRIBUTES && !(fileData & FILE_ATTRIBUTE_DIRECTORY));
+    #endif
+    return false;
 }
 
 bool FileSystem::DirectoryExists(wstring path)
 {
+    #ifdef _WIN32
     DWORD fileData = ::GetFileAttributes(path.c_str());
     return (fileData != INVALID_FILE_ATTRIBUTES && (fileData & FILE_ATTRIBUTE_DIRECTORY));
+    #endif
+    return false;
 }
 
 

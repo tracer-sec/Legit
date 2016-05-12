@@ -1,10 +1,11 @@
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
-#include <Windows.h>
-#include <WinSock2.h>
-#include <WS2tcpip.h>
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #include <Windows.h>
+    #include <WinSock2.h>
+    #include <WS2tcpip.h>
+#endif
 
 #include <string>
 
@@ -47,7 +48,11 @@ protected:
 
 private:
     static bool initialised_;
+    #ifdef _WIN32
     SOCKET socket_;
+    #else
+    int socket_;
+    #endif
     std::string name_;
     std::string host_;
 };

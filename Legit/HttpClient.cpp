@@ -1,7 +1,10 @@
 #include "HttpClient.hpp"
 #include "Utils.hpp"
 
-#include <Ws2tcpip.h>
+#ifndef _WIN32
+#include "Shims.hpp"
+#endif
+
 #include <sstream>
 #include <cstring> // for memset
 
@@ -95,23 +98,22 @@ string HttpClient::ReadUntil(const string &match)
     // Guess not, start consuming the stream again
     char buffer[4097];
     ostringstream ss;
+    ss << remains_;
+    
     memset(buffer, 0, sizeof(buffer));
     int bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
     char *find = strstr(buffer, match.c_str());
-    ss << remains_;
     while (find == nullptr && bytesRead > 0)
     {
         ss << buffer;
         memset(buffer, 0, sizeof(buffer));
         bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
-    }
-    if (find - buffer >= 0)
-    {
-        string s = string(buffer, find - buffer);
-        ss << s;
+        find = strstr(buffer, match.c_str());
     }
     if (find != nullptr)
     {
+        string s = string(buffer, find - buffer);
+        ss << s;
         remains_ = find + match.length();
     }
     return ss.str();
@@ -191,3 +193,4 @@ void HttpClient::RemoveHeader(string key)
 {
     headers_.erase(key);
 }
+

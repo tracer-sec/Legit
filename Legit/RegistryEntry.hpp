@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef _WIN32
+
 #include <Windows.h>
 #include <string>
 #include <vector>
@@ -23,3 +25,6 @@ private:
 };
 
 } // end namespace
+
+#endif
+

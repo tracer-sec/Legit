@@ -1,5 +1,6 @@
 #include "Mocks.hpp"
 #include <algorithm>
+#include <cstring> // for memset
 
 #undef min
 
