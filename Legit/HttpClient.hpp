@@ -20,7 +20,7 @@ class HttpClient
 {
 public:
     HttpClient(const std::string host);
-    HttpClient(std::unique_ptr<Socket> socket);
+    HttpClient(std::unique_ptr<ISocket> socket);
 
     HttpResponse Get(const std::string &url);
     HttpResponse Post(const std::string &url, const std::string &body, const std::string &encoding);
@@ -37,8 +37,7 @@ private:
     std::string ReadUntil(const std::string &match);
 
     std::string host_;
-    sockaddr_in address_;
-    std::unique_ptr<Socket> socket_;
+    std::unique_ptr<ISocket> socket_;
     std::string remains_;
     std::unordered_map<std::string, std::string> headers_;
 };

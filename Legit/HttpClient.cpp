@@ -15,7 +15,7 @@ HttpClient::HttpClient(const string host) :
     headers_["User-Agent"] = "Legit v0";
 }
 
-HttpClient::HttpClient(unique_ptr<Socket> s) :
+HttpClient::HttpClient(unique_ptr<ISocket> s) :
     socket_(move(s))
 {
     host_ = socket_->GetHost();
@@ -105,9 +105,15 @@ string HttpClient::ReadUntil(const string &match)
         memset(buffer, 0, sizeof(buffer));
         bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
     }
-    string s = string(buffer, find - buffer);
-    ss << s;
-    remains_ = find + match.length();
+    if (find - buffer >= 0)
+    {
+        string s = string(buffer, find - buffer);
+        ss << s;
+    }
+    if (find != nullptr)
+    {
+        remains_ = find + match.length();
+    }
     return ss.str();
 }
 

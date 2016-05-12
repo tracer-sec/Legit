@@ -19,7 +19,7 @@ std::string IrcMessage::GetReturnName()
         return "";
 }
 
-IrcClient::IrcClient(unique_ptr<Socket> s, string nick) :
+IrcClient::IrcClient(unique_ptr<ISocket> s, string nick) :
     socket_(move(s)),
     receivedFirstPing_(false)
 {

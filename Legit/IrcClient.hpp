@@ -21,7 +21,7 @@ struct IrcMessage
 class IrcClient
 {
 public:
-    IrcClient(std::unique_ptr<Socket> socket, std::string nick);
+    IrcClient(std::unique_ptr<ISocket> socket, std::string nick);
     IrcClient(std::string host, std::string port, std::string nick);
     
     void Send(std::string message);
@@ -34,7 +34,7 @@ private:
     IrcMessage ParseMessage(std::string m);
 
     std::string error_;
-    std::unique_ptr<Socket> socket_;
+    std::unique_ptr<ISocket> socket_;
     std::string remains_;
     bool receivedFirstPing_;
 };
