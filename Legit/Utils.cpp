@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <codecvt>
 
 using namespace Legit;
 using namespace std;
@@ -75,4 +76,10 @@ string Utils::Join(string seperator, vector<string> stringList)
     }
 
     return ss.str();
+}
+
+wstring Utils::WideFromString(const string &s)
+{
+    wstring_convert<codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(s);
 }

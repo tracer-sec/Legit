@@ -11,6 +11,7 @@
 
 namespace Legit
 {
+
 class ISocket
 {
 public:

@@ -14,6 +14,7 @@ namespace Utils
     std::string Hex(char *data, size_t length);
     std::string FriendlySize(size_t length);
     std::string Join(std::string seperator, std::vector<std::string> stringList);
+    std::wstring WideFromString(const std::string &s);
 }
 
 } // end namespace

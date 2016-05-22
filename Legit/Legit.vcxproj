@@ -97,6 +97,7 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RegistryEntry.cpp" />
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="SystemInfo.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +107,7 @@
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RegistryEntry.hpp" />
     <ClInclude Include="Socket.hpp" />
+    <ClInclude Include="SystemInfo.hpp" />
     <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
