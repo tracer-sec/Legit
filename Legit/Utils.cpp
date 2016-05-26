@@ -2,7 +2,10 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+
+#ifdef _WIN32
 #include <codecvt>
+#endif
 
 using namespace Legit;
 using namespace std;
@@ -91,6 +94,11 @@ string Utils::Join(string seperator, vector<string> stringList)
 
 wstring Utils::WideFromString(const string &s)
 {
+    #ifdef _WIN32
     wstring_convert<codecvt_utf8<wchar_t>> converter;
     return converter.from_bytes(s);
+    #else
+    return wstring(s.begin(), s.end());
+    #endif
 }
+

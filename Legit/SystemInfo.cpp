@@ -1,8 +1,12 @@
 #include "SystemInfo.hpp"
 #include "Utils.hpp"
 
+#ifdef _WIN32
 #include <WinSock2.h>
 #include <IPHlpApi.h>
+#else
+#include <sys/utsname.h>
+#endif
 #include <sstream>
 
 using namespace Legit;
@@ -10,8 +14,9 @@ using namespace std;
 
 SystemInfo::SystemInfo()
 {
+    #ifdef _WIN32
     platform_ = L"Windows";
-
+    
     OSVERSIONINFOEX versionInfo;
     memset(&versionInfo, 0, sizeof(OSVERSIONINFOEX));
     versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
@@ -57,7 +62,16 @@ SystemInfo::SystemInfo()
     wostringstream ss;
     ss << major << "." << minor << "." << servicePack;
     version_ = ss.str();
+    #else
+    utsname versionData;
+    ::uname(&versionData);
+    string p(versionData.sysname);
+    string v(versionData.release);
+    platform_ = Utils::WideFromString(p);
+    version_ = Utils::WideFromString(v);
+    #endif
 
+    #ifdef _WIN32
     // Get adapter MACs
     DWORD size = 0;
 
@@ -86,6 +100,7 @@ SystemInfo::SystemInfo()
             interfaces_.push_back(i);
         }
     }
+    #endif
 }
 
 void SystemInfo::Dump(wostream &s)
