@@ -39,7 +39,8 @@ HttpResponse HttpClient::ParseResponse()
         header = ReadUntil("\r\n");
     }
     // Read response body
-    if (response.headers["Transfer-Encoding"] == "chunked") // TODO: this will create the header if it's not present. Fix
+    if (response.headers.find("Transfer-Encoding") != response.headers.end() 
+        && response.headers["Transfer-Encoding"] == "chunked")
     {
         ostringstream ss;
         string line = ReadUntil("\r\n");

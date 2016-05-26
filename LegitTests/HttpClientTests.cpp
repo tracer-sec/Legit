@@ -29,6 +29,7 @@ TEST_CASE("HttpClient test ParseResponse")
     auto response = client.Get("/index.html");
 
     REQUIRE(response.statusCode == "HTTP/1.1 200 OK");
+    REQUIRE(response.headers.size() == 1);
     REQUIRE(response.headers["Content-Length"] == "13");
     REQUIRE(response.body == "<html></html>");
 }
