@@ -7,15 +7,26 @@
 using namespace Legit;
 using namespace std;
 
-wstring Utils::FindAndReplace(wstring src, wstring match, wstring replacement)
+template<class T>
+basic_string<T> FindAndReplaceWorker(basic_string<T> &src, const basic_string<T> &match, const basic_string<T> &replacement)
 {
     auto f = src.find(match);
-    while (f != wstring::npos)
+    while (f != string::npos)
     {
         src.replace(f, match.length(), replacement);
         f = src.find(match, f + replacement.length());
     }
     return src;
+}
+
+string Utils::FindAndReplace(string src, const string &match, const string &replacement)
+{
+    return FindAndReplaceWorker<string::value_type>(src, match, replacement);
+}
+
+wstring Utils::FindAndReplace(wstring src, const wstring &match, const wstring &replacement)
+{
+    return FindAndReplaceWorker<wstring::value_type>(src, match, replacement);
 }
 
 string Utils::Trim(string s)
