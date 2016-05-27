@@ -28,8 +28,10 @@ TEST_CASE("HttpClient test ParseResponse")
     HttpClient client(make_unique<Mocket>("www.google.co.uk", "80", sent, "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\n<html></html>"));
     auto response = client.Get("/index.html");
 
+    string body(response.body.begin(), response.body.end());
+
     REQUIRE(response.statusCode == "HTTP/1.1 200 OK");
     REQUIRE(response.headers.size() == 1);
     REQUIRE(response.headers["Content-Length"] == "13");
-    REQUIRE(response.body == "<html></html>");
+    REQUIRE(body == "<html></html>");
 }
