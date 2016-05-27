@@ -3,6 +3,7 @@
 #include "Socket.hpp"
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <memory>
 
@@ -13,7 +14,7 @@ struct HttpResponse
 {
     std::string statusCode;
     std::unordered_map<std::string, std::string> headers;
-    std::string body;
+    std::vector<char> body;
 };
 
 class HttpClient
@@ -33,12 +34,12 @@ public:
 private:
     HttpResponse SendRequest(std::string request);
     HttpResponse ParseResponse();
-    std::string ReadBytes(size_t length);
-    std::string ReadUntil(const std::string &match);
+    std::vector<char> ReadBytes(size_t length);
+    std::vector<char> ReadUntil(const std::string &match);
 
     std::string host_;
     std::unique_ptr<ISocket> socket_;
-    std::string remains_;
+    std::vector<char> remains_;
     std::unordered_map<std::string, std::string> headers_;
 };
 

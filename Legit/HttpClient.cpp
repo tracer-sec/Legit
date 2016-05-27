@@ -6,6 +6,7 @@
 #endif
 
 #include <sstream>
+#include <algorithm>
 #include <cstring> // for memset
 
 using namespace Legit;
@@ -29,13 +30,14 @@ HttpResponse HttpClient::ParseResponse()
 {
     HttpResponse response;
     // Read response status
-    response.statusCode = ReadUntil("\r\n");
+    auto statusLine = ReadUntil("\r\n");
+    response.statusCode = string(statusLine.begin(), statusLine.end());
     // Read response header
-    string header = ReadUntil("\r\n");
-    while (header.length() > 0)
+    vector<char> header = ReadUntil("\r\n");
+    while (header.size() > 0)
     {
-        auto offset = header.find(':');
-        response.headers.insert(make_pair(header.substr(0, offset), Utils::Trim(header.substr(offset + 1))));
+        auto offset = find(header.begin(), header.end(), ':');
+        response.headers.insert(make_pair(string(header.begin(), offset), Utils::Trim(string(offset + 1, header.end()))));
         header = ReadUntil("\r\n");
     }
     // Read response body
@@ -43,17 +45,16 @@ HttpResponse HttpClient::ParseResponse()
         && response.headers["Transfer-Encoding"] == "chunked")
     {
         ostringstream ss;
-        string line = ReadUntil("\r\n");
-        int chunkSize = stoi(line.c_str(), 0, 16);
+        vector<char> line = ReadUntil("\r\n");
+        int chunkSize = stoi(string(line.begin(), line.end()), 0, 16);
         while (chunkSize > 0)
         {
-            string chunk = ReadBytes(chunkSize);
-            ss << chunk;
-            string line = ReadUntil("\r\n"); // Skip the blank line between chunks
+            vector<char> chunk = ReadBytes(chunkSize);
+            response.body.insert(response.body.end(), chunk.begin(), chunk.end());
+            line = ReadUntil("\r\n"); // Skip the newline between chunks
             line = ReadUntil("\r\n");
-            chunkSize = stoi(line.c_str(), 0, 16);
+            chunkSize = stoi(string(line.begin(), line.end()), 0, 16);
         }
-        response.body = ss.str();
     }
     else
     {
@@ -64,60 +65,56 @@ HttpResponse HttpClient::ParseResponse()
     return response;
 }
 
-string HttpClient::ReadBytes(size_t length)
+vector<char> HttpClient::ReadBytes(size_t length)
 {
-    // TODO: what if remains.length() > length
-    // TODO: what about binary data? string should be able to handle embedded nulls ...
     char buffer[4096];
-    ostringstream ss;
-    ss << remains_;
-    size_t totalBytes = remains_.length();
+    vector<char> result;
+    result.insert(result.end(), remains_.begin(), remains_.begin() + min(length, remains_.size()));
+    remains_.erase(remains_.begin(), remains_.begin() + result.size());
 
-    while (totalBytes < length)
+    while (result.size() < length)
     {
         memset(buffer, 0, sizeof(buffer));
-        int bytesRead = socket_->Receive(buffer, min(sizeof(buffer), length - totalBytes));
-        ss << string(buffer, 0, bytesRead);
-        totalBytes += bytesRead;
+        int bytesRead = socket_->Receive(buffer, min(sizeof(buffer), length - result.size()));
+        result.insert(result.end(), buffer, buffer + bytesRead);
     }
 
-    remains_ = "";
-    return ss.str();
+    return result;
 }
 
-string HttpClient::ReadUntil(const string &match)
+vector<char> HttpClient::ReadUntil(const string &match)
 {
+    vector<char> result;
+
     // Is it sitting in the leftover buffer?
-    auto gotit = remains_.find(match);
-    if (gotit != string::npos)
+    auto gotit = search(remains_.begin(), remains_.end(), match.begin(), match.end());
+    if (gotit != remains_.end())
     {
-        string result = remains_.substr(0, gotit);
-        remains_ = remains_.substr(gotit + match.length());
+        result.insert(result.end(), remains_.begin(), gotit);
+        remains_ = vector<char>(gotit + match.length(), remains_.end());
         return result;
     }
 
     // Guess not, start consuming the stream again
     char buffer[4097];
-    ostringstream ss;
-    ss << remains_;
+    result.insert(result.end(), remains_.begin(), remains_.end());
     
     memset(buffer, 0, sizeof(buffer));
     int bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
     char *find = strstr(buffer, match.c_str());
     while (find == nullptr && bytesRead > 0)
     {
-        ss << buffer;
+        result.insert(result.end(), buffer, buffer + bytesRead);
         memset(buffer, 0, sizeof(buffer));
         bytesRead = socket_->Receive(buffer, sizeof(buffer) - 1);
         find = strstr(buffer, match.c_str());
     }
     if (find != nullptr)
     {
-        string s = string(buffer, find - buffer);
-        ss << s;
-        remains_ = find + match.length();
+        result.insert(result.end(), buffer, buffer + (find - buffer));
+        remains_ = vector<char>(find + match.length(), buffer + bytesRead);
     }
-    return ss.str();
+    return result;
 }
 
 HttpResponse HttpClient::SendRequest(string request)
