@@ -57,14 +57,15 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>botan_s.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -78,6 +79,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,26 +88,30 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>botan_s.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CertStore.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="HttpClient.cpp" />
     <ClCompile Include="IrcClient.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RegistryEntry.cpp" />
+    <ClCompile Include="SecureSocket.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="SystemInfo.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CertStore.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="HttpClient.hpp" />
     <ClInclude Include="IrcClient.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RegistryEntry.hpp" />
+    <ClInclude Include="SecureSocket.hpp" />
     <ClInclude Include="Socket.hpp" />
     <ClInclude Include="SystemInfo.hpp" />
     <ClInclude Include="Utils.hpp" />
