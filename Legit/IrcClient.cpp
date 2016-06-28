@@ -68,8 +68,14 @@ IrcMessage IrcClient::Receive()
     {
         char buffer[4096];
         memset(buffer, 0, sizeof(buffer));
-        socket_->Receive(buffer, sizeof(buffer));
-        remains_.append(buffer);
+        auto bytesRead = socket_->Receive(buffer, sizeof(buffer));
+        if (bytesRead >= 0)
+            remains_.append(buffer, bytesRead);
+        else
+        {
+            // Socket error. OHSHI-
+            return IrcMessage();
+        }
         endline = remains_.find("\r\n");
     }
 

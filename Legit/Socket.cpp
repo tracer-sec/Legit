@@ -99,7 +99,10 @@ int Socket::Send(string s)
 
 int Socket::Receive(char *buffer, size_t length)
 {
-    return ::recv(socket_, buffer, length, 0);
+    auto bytesRead = ::recv(socket_, buffer, length, 0);
+    if (bytesRead == SOCKET_ERROR)
+        error_ = "Error during recv";
+    return bytesRead;
 }
 
 void Socket::Close()

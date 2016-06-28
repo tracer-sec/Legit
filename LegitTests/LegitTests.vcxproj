@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HttpUtilsTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mocks.cpp" />
     <ClCompile Include="RandomTests.cpp" />
