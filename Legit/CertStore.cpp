@@ -1,7 +1,9 @@
 #include "CertStore.hpp"
 
-#include <Windows.h>
-#include <wincrypt.h>
+#ifdef _WIN32
+    #include <Windows.h>
+    #include <wincrypt.h>
+#endif
 #include <iostream>
 
 using namespace Legit;
@@ -11,6 +13,7 @@ using namespace Botan;
 CertStore::CertStore() :
     validate_(true)
 {
+    #ifdef _WIN32
     HANDLE certStore = ::CertOpenSystemStore(NULL, L"ROOT");
     PCCERT_CONTEXT certContext = ::CertEnumCertificatesInStore(certStore, nullptr);
 
@@ -35,6 +38,7 @@ CertStore::CertStore() :
     }
 
     ::CertCloseStore(certStore, 0);
+    #endif
 }
 
 CertStore::CertStore(string pem) :

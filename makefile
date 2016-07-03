@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-c -Wall -std=c++11
-LDFLAGS=
+LDFLAGS=-Wl,-rpath,/usr/local/lib
 AR=ar
 ARFLAGS=-rcs
 
@@ -20,9 +20,9 @@ TESTS=$(BINDIR)/LegitTests
 all: setup $(LIB) $(TESTS)
 
 $(LIB): $(OBJECTS) ; $(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
-$(TESTS): $(LIB) $(TESTOBJECTS) ; $(CC) $(LDFLAGS) $(TESTOBJECTS) -o $@ -L$(BINDIR) -llegit
+$(TESTS): $(LIB) $(TESTOBJECTS) ; $(CC) $(LDFLAGS) $(TESTOBJECTS) -o $@ -L$(BINDIR) -L../../lib/Botan-1.11.30 -llegit -lbotan-1.11
 
-$(OBJDIR)/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $<
+$(OBJDIR)/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../../lib/Botan-1.11.30/build/include
 $(OBJDIR)/$(TSTDIR)/%.o: $(TSTDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -ILegit
 
 clean: ; rm -f $(BINDIR)/* $(OBJDIR)/$(SRCDIR)/* $(OBJDIR)/$(TSTDIR)/*

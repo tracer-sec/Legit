@@ -67,9 +67,11 @@ Socket::Socket(string host, string service, unsigned short timeout) :
         #ifdef _WIN32
         DWORD t = timeout;
         #else
-        int t = timeout;
+        timeval t;
+        t.tv_sec = 0;
+        t.tv_usec = timeout;
         #endif
-        result = ::setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&t), sizeof(t));
+        result = ::setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
         if (result == SOCKET_ERROR)
         {
             error_ = "Could not set timeout";
@@ -101,7 +103,15 @@ int Socket::Receive(char *buffer, size_t length)
 {
     auto bytesRead = ::recv(socket_, buffer, length, 0);
     if (bytesRead == SOCKET_ERROR)
-        error_ = "Error during recv";
+    {
+        #ifdef _WIN32
+        int errno = WSAGetLastError();
+        #endif
+        if (errno == EAGAIN)
+            bytesRead = 0;
+        else
+            error_ = "Error during recv";
+    }
     return bytesRead;
 }
 
@@ -132,3 +142,4 @@ bool Socket::Shutdown()
     return true;
     #endif
 }
+

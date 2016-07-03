@@ -4,6 +4,11 @@
 // TODO: remove
 #include <iostream>
 
+#ifndef _WIN32
+    #include "Shims.hpp"
+    #define SOCKET_ERROR    (-1)
+#endif
+
 using namespace Legit;
 using namespace std;
 using namespace std::placeholders;
@@ -41,11 +46,13 @@ SecureSocket::SecureSocket(string host, string service, unique_ptr<CertStore> cr
     while (!client_->is_active() && !client_->is_closed())
     {
         char buffer[1024] = { 0 };
-        size_t bytesRead = Socket::Receive(buffer, 1024);
+        int bytesRead = Socket::Receive(buffer, 1024);
 
-        if (bytesRead == SOCKET_ERROR || bytesRead == 0)
+        if (bytesRead == SOCKET_ERROR)
         {
+            #ifdef _WIN32
             auto foo = ::WSAGetLastError();
+            #endif
             error_ = "Error performing TLS handshake";
             break;
         }
@@ -77,7 +84,9 @@ void SecureSocket::output(const Botan::byte *data, size_t length)
         size_t sent = Socket::Send(reinterpret_cast<const char *>(data + offset), length - offset);
         if (sent == SOCKET_ERROR)
         {
+            #ifdef _WIN32
             auto foo = ::WSAGetLastError();
+            #endif
             break;
         }
         offset += sent;
@@ -135,7 +144,9 @@ int SecureSocket::Receive(char *buffer, size_t length)
             size_t bytesReadFromSocket = Socket::Receive(socketBuffer, 1024);
             if (bytesReadFromSocket == 0 || bytesReadFromSocket == SOCKET_ERROR)
             {
+                #ifdef _WIN32
                 auto foo = ::WSAGetLastError();
+                #endif
                 break;
             }
             client_->received_data((Botan::byte *)socketBuffer, bytesReadFromSocket);
@@ -150,3 +161,4 @@ void SecureSocket::Close()
     client_->close();
     Socket::Close();
 }
+
