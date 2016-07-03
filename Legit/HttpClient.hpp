@@ -25,6 +25,7 @@ public:
 
     HttpResponse Get(const std::string &url);
     HttpResponse Post(const std::string &url, const std::string &body, const std::string &encoding);
+    HttpResponse Post(const std::string &url, const std::vector<char> &body, const std::string &encoding);
     HttpResponse Put(const std::string &url, const std::string &body, const std::string &encoding);
     HttpResponse Delete(const std::string &url);
 

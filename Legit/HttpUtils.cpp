@@ -75,7 +75,7 @@ vector<char> HttpUtils::CreateBody(unordered_map<string, string> fields, unorder
     for (auto d : fields)
     {
         ostringstream headerBuilder;
-        headerBuilder << boundary << "\r\n";
+        headerBuilder << "--" << boundary << "\r\n";
         headerBuilder << "Content-Disposition: form-data; name=\"" << d.first << "\"\r\n\r\n";
         string sectionHeader = headerBuilder.str();
 
@@ -87,7 +87,7 @@ vector<char> HttpUtils::CreateBody(unordered_map<string, string> fields, unorder
     for (auto f : files)
     {
         ostringstream headerBuilder;
-        headerBuilder << boundary << "\r\n";
+        headerBuilder << "--" << boundary << "\r\n";
         headerBuilder << "Content-Disposition: form-data; name=\"" << f.first << "\"; filename=\"" << f.second.filename << "\"\r\nContent-Type: application/octet-stream\r\n\r\n";
         string sectionHeader = headerBuilder.str();
 

@@ -138,6 +138,12 @@ HttpResponse HttpClient::Get(const string &url)
     return SendRequest(ss.str());
 }
 
+HttpResponse HttpClient::Post(const string &url, const vector<char> &body, const string &encoding)
+{
+    string bodyStr(body.begin(), body.end());
+    return Post(url, bodyStr, encoding);
+}
+
 HttpResponse HttpClient::Post(const string &url, const string &body, const string &encoding)
 {
     ostringstream ss;
