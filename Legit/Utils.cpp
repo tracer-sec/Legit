@@ -102,3 +102,12 @@ wstring Utils::WideFromString(const string &s)
     #endif
 }
 
+string Utils::StringFromWide(const wstring &w)
+{
+    #ifdef _WIN32
+    wstring_convert<codecvt_utf8<wchar_t>> converter;
+    return converter.to_bytes(w);
+    #else
+    return string(w.begin(), w.end());
+    #endif
+}
