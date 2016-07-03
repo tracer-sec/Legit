@@ -64,7 +64,7 @@ Socket::Socket(string host, string service, unsigned short timeout) :
 
     if (timeout > 0)
     {
-        #if _WIN32
+        #ifdef _WIN32
         DWORD t = timeout;
         #else
         int t = timeout;
@@ -80,7 +80,7 @@ Socket::Socket(string host, string service, unsigned short timeout) :
 
 Socket::~Socket()
 {
-    #if _WIN32
+    #ifdef _WIN32
     ::closesocket(socket_);
     #else
     ::close(socket_);
@@ -107,7 +107,7 @@ int Socket::Receive(char *buffer, size_t length)
 
 void Socket::Close()
 {
-    #if _WIN32
+    #ifdef _WIN32
     ::closesocket(socket_);
     #else
     ::close(socket_);
