@@ -16,6 +16,15 @@ using namespace std;
 
 bool Socket::initialised_ = false;
 
+int GetSystemError()
+{
+    #ifdef _WIN32
+        return ::WSAGetLastError();
+    #else
+        return errno;
+    #endif
+}
+
 Socket::Socket(string host, string service, unsigned short timeout) :
     host_(host)
 {
@@ -69,9 +78,9 @@ Socket::Socket(string host, string service, unsigned short timeout) :
         #else
         timeval t;
         t.tv_sec = 0;
-        t.tv_usec = timeout;
+        t.tv_usec = timeout * 1000;
         #endif
-        result = ::setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
+        result = ::setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&t), sizeof(t));
         if (result == SOCKET_ERROR)
         {
             error_ = "Could not set timeout";
@@ -102,13 +111,21 @@ int Socket::Send(string s)
 int Socket::Receive(char *buffer, size_t length)
 {
     auto bytesRead = ::recv(socket_, buffer, length, 0);
+    
+    if (bytesRead == 0) // Actually closed gracefully, but this makes more sense
+        return SOCKET_ERROR;
+
     if (bytesRead == SOCKET_ERROR)
     {
+        // We're assuming it's nonblocking if it chucks any of those. I hate this behaviour
+        int err = GetSystemError();
         #ifdef _WIN32
-        int errno = WSAGetLastError();
-        #endif
-        if (errno == EAGAIN)
+        if (err == WSAEWOULDBLOCK || err == WSAETIMEDOUT) // Not just me. Fuck you, Winsock. https://lists.gnupg.org/pipermail/gnutls-devel/2008-June/002384.html
             bytesRead = 0;
+        #else
+        if (err == EAGAIN || err == EWOULDBLOCK)
+            bytesRead = 0;
+        #endif
         else
             error_ = "Error during recv";
     }
