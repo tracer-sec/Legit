@@ -94,10 +94,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CertStore.cpp" />
+    <ClCompile Include="DataLoader.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="HttpClient.cpp" />
     <ClCompile Include="HttpUtils.cpp" />
     <ClCompile Include="IrcClient.cpp" />
+    <ClCompile Include="Processes.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="RegistryEntry.cpp" />
     <ClCompile Include="SecureSocket.cpp" />
@@ -107,10 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CertStore.hpp" />
+    <ClInclude Include="DataLoader.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="HttpClient.hpp" />
     <ClInclude Include="HttpUtils.hpp" />
     <ClInclude Include="IrcClient.hpp" />
+    <ClInclude Include="Processes.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="RegistryEntry.hpp" />
     <ClInclude Include="SecureSocket.hpp" />
