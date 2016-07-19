@@ -59,3 +59,12 @@ TEST_CASE("HttpUtils multipart encoding")
 
     REQUIRE(result == compare);
 }
+
+TEST_CASE("HttpUtils parse url")
+{
+    auto result = HttpUtils::SplitUrl("http://www.example.com/test/foo?bar=baz");
+
+    REQUIRE(result[0] == "http://");
+    REQUIRE(result[1] == "www.example.com");
+    REQUIRE(result[2] == "/test/foo?bar=baz");
+}
