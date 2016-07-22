@@ -101,3 +101,18 @@ vector<char> HttpUtils::CreateBody(unordered_map<string, string> fields, unorder
         
     return result;
 }
+
+vector<string> HttpUtils::SplitUrl(string url)
+{
+    int offset = 0;
+    int found = url.find_first_of("://");
+    string scheme;
+    if (found != string::npos)
+        scheme = url.substr(offset, found + 3);
+    offset += scheme.size();
+    string host = url.substr(offset, url.find_first_of("/", offset) - offset);
+    offset += host.size();
+    string path = url.substr(offset);
+
+    return vector<string> { scheme, host, path };
+}
