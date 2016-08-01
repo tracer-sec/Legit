@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "HttpUtils.hpp"
+#include "Utils.hpp"
 
 using namespace Legit;
 using namespace std;
@@ -14,7 +15,11 @@ TEST_CASE("HttpUtils www form encoding")
     auto body = HttpUtils::CreateBody(fields);
     string result(body.begin(), body.end());
 
-    REQUIRE(result == "foo=bar&baz=123");
+    vector<string> parts = Utils::Split(result, "&");
+
+    REQUIRE(parts.size() == 2);
+    REQUIRE(find(parts.begin(), parts.end(), "foo=bar") != parts.end());
+    REQUIRE(find(parts.begin(), parts.end(), "baz=123") != parts.end());
 }
 
 TEST_CASE("HttpUtils multipart encoding")
@@ -36,28 +41,40 @@ TEST_CASE("HttpUtils multipart encoding")
     auto body = HttpUtils::CreateBody(fields, files, boundary);
     string result(body.begin(), body.end());
 
-    string compare = 
-        "--" + boundary + "\r\n" +
-        "Content-Disposition: form-data; name=\"foo\"\r\n" +
-        "\r\n" +
-        "bar\r\n" +
-        "--" + boundary + "\r\n" +
-        "Content-Disposition: form-data; name=\"baz\"\r\n" +
-        "\r\n" +
-        "123\r\n" +
-        "--" + boundary + "\r\n" +
-        "Content-Disposition: form-data; name=\"f0\"; filename=\"original_f0.txt\"\r\n" +
-        "Content-Type: application/octet-stream\r\n" +
-        "\r\n" +
-        "AAAAAAAAAAAAAAAA\r\n" +
-        "--" + boundary + "\r\n" +
-        "Content-Disposition: form-data; name=\"f1\"; filename=\"original_f1.txt\"\r\n" +
-        "Content-Type: application/octet-stream\r\n" +
-        "\r\n" +
-        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\r\n" +
-        "--" + boundary + "--\r\n";
+    vector<string> parts = Utils::Split(result, "--" + boundary);
 
-    REQUIRE(result == compare);
+    REQUIRE(parts.size() == 6);
+    REQUIRE(parts[0] == "");
+    REQUIRE(parts[5] == "--\r\n");
+
+    vector<string> compare = {
+        "\r\n"
+        "Content-Disposition: form-data; name=\"foo\"\r\n"
+        "\r\n"
+        "bar\r\n",
+
+        "\r\n"
+        "Content-Disposition: form-data; name=\"baz\"\r\n"
+        "\r\n"
+        "123\r\n",
+        
+        "\r\n"
+        "Content-Disposition: form-data; name=\"f0\"; filename=\"original_f0.txt\"\r\n"
+        "Content-Type: application/octet-stream\r\n"
+        "\r\n"
+        "AAAAAAAAAAAAAAAA\r\n",
+        
+        "\r\n"
+        "Content-Disposition: form-data; name=\"f1\"; filename=\"original_f1.txt\"\r\n"
+        "Content-Type: application/octet-stream\r\n"
+        "\r\n"
+        "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\r\n"
+    };
+
+    for (string c : compare)
+    {
+        REQUIRE(find(parts.begin(), parts.end(), c) != parts.end());
+    }
 }
 
 TEST_CASE("HttpUtils parse url")
@@ -67,4 +84,13 @@ TEST_CASE("HttpUtils parse url")
     REQUIRE(result[0] == "http://");
     REQUIRE(result[1] == "www.example.com");
     REQUIRE(result[2] == "/test/foo?bar=baz");
+}
+
+TEST_CASE("HttpUtils parse url 2")
+{
+    auto result = HttpUtils::SplitUrl("https://2600.london");
+
+    REQUIRE(result[0] == "https://");
+    REQUIRE(result[1] == "2600.london");
+    REQUIRE(result[2] == "");
 }
