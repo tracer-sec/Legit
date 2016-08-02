@@ -1,6 +1,9 @@
 #include "DataLoader.hpp"
-#include <Windows.h>
+#include "Utils.hpp"
 #include <fstream>
+#ifdef _WIN32
+    #include <Windows.h>
+#endif
 
 using namespace Legit;
 using namespace std;
@@ -35,7 +38,7 @@ bool DataLoader::LoadFromFile(wstring path, vector<char> &data)
 {
     bool result = false;
 
-    ifstream f(path, ios::binary | ios::ate);
+    ifstream f(Utils::StringFromWide(path), ios::binary | ios::ate);
     if (f)
     {
         streamoff length = f.tellg();
@@ -55,7 +58,7 @@ bool DataLoader::DumpToFile(wstring path, vector<char> &data)
 {
     bool result = false;
 
-    ofstream f(path, ios::binary | ios::ate);
+    ofstream f(Utils::StringFromWide(path), ios::binary | ios::ate);
     if (f)
     {
         f.write(&data[0], data.size());
