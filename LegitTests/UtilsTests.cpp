@@ -98,6 +98,23 @@ TEST_CASE("string join with single element")
     REQUIRE(result == "derp");
 }
 
+TEST_CASE("string split 0")
+{
+    vector<string> result = Utils::Split("this is a test", " ");
+    REQUIRE(result.size() == 4);
+    REQUIRE(result[0] == "this");
+    REQUIRE(result[1] == "is");
+    REQUIRE(result[2] == "a");
+    REQUIRE(result[3] == "test");
+}
+
+TEST_CASE("string split no-split")
+{
+    vector<string> result = Utils::Split("this is a test", "-");
+    REQUIRE(result.size() == 1);
+    REQUIRE(result[0] == "this is a test");
+}
+
 TEST_CASE("wide from string")
 {
     auto result = Utils::WideFromString("This is a test");

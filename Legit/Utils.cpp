@@ -92,6 +92,24 @@ string Utils::Join(string seperator, vector<string> stringList)
     return ss.str();
 }
 
+vector<string> Utils::Split(string s, string seperator)
+{
+    vector<string> result;
+
+    size_t start = 0;
+    size_t end = s.find(seperator, 0);
+
+    while (end != string::npos)
+    {
+        result.push_back(s.substr(start, end - start));
+        start = end + seperator.length();
+        end = s.find(seperator, start);
+    }
+    result.push_back(s.substr(start));
+
+    return result;
+}
+
 wstring Utils::WideFromString(const string &s)
 {
     #ifdef _WIN32
