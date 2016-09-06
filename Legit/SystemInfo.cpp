@@ -4,6 +4,7 @@
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <IPHlpApi.h>
+#include <Lm.h>
 #else
 #include <sys/utsname.h>
 #endif
@@ -101,6 +102,45 @@ SystemInfo::SystemInfo()
         }
     }
     #endif
+
+    #ifdef _WIN32
+    vector<wchar_t> usernameBuffer(UNLEN + 1);
+    size = UNLEN + 1;
+    if (::GetUserName(&usernameBuffer[0], &size) != 0)
+    {
+        currentUser_ = wstring(usernameBuffer.begin(), usernameBuffer.begin() + size);
+    }
+    #else
+    vector<char> usernameBuffer(256);
+    if (getlogin_r(&usernameBuffer[0], 256) == 0)
+    {
+        string s(usernameBuffer);
+        currentUser_ = Utils::WideFromString(s);
+    }
+    #endif
+
+    #ifdef _WIN32
+    USER_INFO_3 *userInfo;
+    DWORD entriesRead;
+    DWORD totalEntries;
+    DWORD resumeHandle = 0;
+
+    DWORD result = ::NetUserEnum(nullptr, 3, 0, reinterpret_cast<LPBYTE *>(&userInfo), MAX_PREFERRED_LENGTH, &entriesRead, &totalEntries, &resumeHandle);
+    if (result == NERR_Success)
+    {
+        for (unsigned int i = 0; i < entriesRead; ++i)
+        {
+            User u;
+            u.username = wstring(userInfo[i].usri3_name);
+            u.fullName = wstring(userInfo[i].usri3_full_name);
+            u.priviledges = userInfo[i].usri3_priv;
+            u.userId = userInfo[i].usri3_user_id;
+            users_.push_back(u);
+        }
+    }
+    ::NetApiBufferFree(userInfo);
+    #endif
+
 }
 
 void SystemInfo::Dump(wostream &s)
