@@ -64,7 +64,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>botan_sd.lib;</AdditionalDependencies>
+      <AdditionalDependencies>botan_sd.lib;Netapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -88,7 +88,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>botan_s.lib;</AdditionalDependencies>
+      <AdditionalDependencies>botan_s.lib;Netapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
