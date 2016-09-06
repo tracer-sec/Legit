@@ -1,4 +1,5 @@
 #include "Processes.hpp"
+#include "Utils.hpp"
 
 #ifdef _WIN32
     #include <Windows.h>
@@ -109,3 +110,63 @@ bool Processes::KillProcess(int processId)
 
     return success;
 }
+
+string Processes::GetExecutablePath()
+{
+    #ifdef _WIN32
+
+    TCHAR buffer[MAX_PATH + 1];
+    DWORD length = ::GetModuleFileName(NULL, buffer, MAX_PATH + 1);
+    wstring widePath(&buffer[0], length);
+    string path = Utils::StringFromWide(widePath);
+    char SEPERATOR = '\\';
+
+    #else
+
+    char pathBuffer[1025] = { 0 };
+    readlink("/proc/self/exe", pathBuffer, 1024);
+    string path(pathBuffer);
+    char SEPERATOR = '/';
+
+    #endif
+
+    auto pos = path.find_last_of(SEPERATOR);
+    if (pos == string::npos)
+        return path;
+
+    return path.substr(0, pos);
+}
+
+#ifdef _WIN32
+
+bool Processes::Inject(wstring path, unsigned int processId)
+{
+    bool success = false;
+
+    auto h = ::OpenProcess(PROCESS_ALL_ACCESS, false, processId);
+    if (h != NULL)
+    {
+        auto kernelLib = ::GetModuleHandle(L"kernel32.dll");
+        char *loadLibraryAddress = reinterpret_cast<char *>(::GetProcAddress(kernelLib, "LoadLibraryW"));
+
+        size_t bufferSize = (path.size() + 1) * sizeof(wstring::value_type); // include the null byte
+        char *addressSpace = reinterpret_cast<char *>(::VirtualAllocEx(h, NULL, bufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+
+        SIZE_T bytesWritten;
+        ::WriteProcessMemory(h, addressSpace, path.c_str(), bufferSize, &bytesWritten);
+
+        DWORD newThreadId;
+        auto remoteThread = ::CreateRemoteThread(h, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(loadLibraryAddress), addressSpace, 0, &newThreadId);
+        ::WaitForSingleObject(remoteThread, 5000);
+
+        ::VirtualFreeEx(h, addressSpace, path.size(), MEM_RELEASE);
+        ::CloseHandle(remoteThread);
+        ::CloseHandle(h);
+
+        success = true;
+    }
+
+    return success;
+}
+
+#endif
