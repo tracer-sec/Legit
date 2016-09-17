@@ -1,9 +1,6 @@
 #include "HttpClient.hpp"
 #include "Utils.hpp"
-
-#ifndef _WIN32
-#include "Shims.hpp"
-#endif
+#include "Environment.hpp"
 
 #include <sstream>
 #include <algorithm>

@@ -1,10 +1,7 @@
 #include "catch.hpp"
 #include "HttpClient.hpp"
 #include "Mocks.hpp"
-
-#ifndef _WIN32
-#include "Shims.hpp"
-#endif
+#include "Environment.hpp"
 
 using namespace Legit;
 using namespace std;

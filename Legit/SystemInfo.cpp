@@ -2,11 +2,12 @@
 #include "Utils.hpp"
 
 #ifdef _WIN32
-#include <WinSock2.h>
-#include <IPHlpApi.h>
-#include <Lm.h>
+    #include <WinSock2.h>
+    #include <IPHlpApi.h>
+    #include <Lm.h>
 #else
-#include <sys/utsname.h>
+    #include <sys/utsname.h>
+    #include <unistd.h>
 #endif
 #include <sstream>
 
@@ -114,7 +115,7 @@ SystemInfo::SystemInfo()
     vector<char> usernameBuffer(256);
     if (getlogin_r(&usernameBuffer[0], 256) == 0)
     {
-        string s(usernameBuffer);
+        string s(usernameBuffer.begin(), usernameBuffer.end());
         currentUser_ = Utils::WideFromString(s);
     }
     #endif

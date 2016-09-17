@@ -6,7 +6,8 @@
     #include <TlHelp32.h>
     #include <Psapi.h>
 #else
-    #include<csignal>
+    #include <csignal>
+    #include <unistd.h>
 #endif
 
 using namespace Legit;

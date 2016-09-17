@@ -1,11 +1,11 @@
 #include "SecureSocket.hpp"
+#include "Environment.hpp"
 #include <botan/auto_rng.h>
 
 // TODO: remove
 #include <iostream>
 
 #ifndef _WIN32
-    #include "Shims.hpp"
     #define SOCKET_ERROR    (-1)
 #endif
 
