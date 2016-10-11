@@ -1,8 +1,11 @@
 #include "FileSystem.hpp"
+#include "Utils.hpp"
 
 #ifdef _WIN32
-#include <Windows.h>
-#include <Shlwapi.h>
+    #include <Windows.h>
+    #include <Shlwapi.h>
+#else
+    #include <dirent.h>
 #endif
 
 using namespace Legit;
@@ -63,6 +66,23 @@ vector<wstring> FileSystem::GetFiles(wstring path)
     }
 
     ::FindClose(handle);
+    #else
+    string p = Utils::StringFromWide(path);
+    DIR *directory = ::opendir(p.c_str());
+    if (directory)
+    {
+        dirent *entry = ::readdir(directory);
+        while (entry != nullptr)
+        {
+            if (entry->d_type == DT_REG || entry->d_type == DT_LNK)
+            {
+                string filename(entry->d_name);
+                result.push_back(Utils::WideFromString(filename));
+            }
+            entry = ::readdir(directory);
+        }
+        ::closedir(directory);
+    }
     #endif
     return result;
 }

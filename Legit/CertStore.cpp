@@ -3,6 +3,9 @@
 #ifdef _WIN32
     #include <Windows.h>
     #include <wincrypt.h>
+#else
+    #include "FileSystem.hpp"
+    #include "DataLoader.hpp"
 #endif
 #include <iostream>
 
@@ -38,6 +41,27 @@ CertStore::CertStore() :
     }
 
     ::CertCloseStore(certStore, 0);
+    #else
+    auto files = FileSystem::GetFiles(L"/etc/ssl/certs");
+    for (auto f : files)
+    {
+        vector<char> data;
+        DataLoader::LoadFromFile(L"/etc/ssl/certs/" + f, data);
+        
+        try
+        {
+            DataSource_Memory certData(reinterpret_cast<Botan::byte *>(&data[0]), data.size());
+            X509_Certificate cert(certData);
+
+            //cout << "cert found: " << cert.subject_dn() << " (" << cert.is_CA_cert() << ")" << endl << flush;
+            
+            certs_.push_back(new Certificate_Store_In_Memory(cert));
+        }
+        catch (std::exception &e)
+        {
+            cerr << "cert error: " << e.what() << endl;
+        }
+    }
     #endif
 }
 
