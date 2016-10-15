@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
+    #define NOMINMAX
+#endif
+
 namespace Legit
 {
     #ifdef _WIN32
@@ -13,4 +17,3 @@ namespace Legit
         }
     #endif
 }
-

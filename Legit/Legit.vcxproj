@@ -110,6 +110,7 @@
   <ItemGroup>
     <ClInclude Include="CertStore.hpp" />
     <ClInclude Include="DataLoader.hpp" />
+    <ClInclude Include="Environment.hpp" />
     <ClInclude Include="FileSystem.hpp" />
     <ClInclude Include="HttpClient.hpp" />
     <ClInclude Include="HttpUtils.hpp" />
