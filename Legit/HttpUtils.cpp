@@ -114,5 +114,15 @@ vector<string> HttpUtils::SplitUrl(string url)
     offset += host.size();
     string path = url.substr(offset);
 
-    return vector<string> { scheme, host, path };
+    // Check to see if a port is specified
+    string port = "";
+    found = host.find_first_of(':');
+    if (found != string::npos)
+    {
+        port = host.substr(found + 1);
+        host = host.substr(0, found);
+    }
+
+    return vector<string> { scheme, host, port, path };
 }
+

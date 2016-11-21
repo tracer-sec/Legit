@@ -83,7 +83,8 @@ TEST_CASE("HttpUtils parse url")
 
     REQUIRE(result[0] == "http://");
     REQUIRE(result[1] == "www.example.com");
-    REQUIRE(result[2] == "/test/foo?bar=baz");
+    REQUIRE(result[2] == "");
+    REQUIRE(result[3] == "/test/foo?bar=baz");
 }
 
 TEST_CASE("HttpUtils parse url 2")
@@ -93,4 +94,16 @@ TEST_CASE("HttpUtils parse url 2")
     REQUIRE(result[0] == "https://");
     REQUIRE(result[1] == "2600.london");
     REQUIRE(result[2] == "");
+    REQUIRE(result[3] == "");
 }
+
+TEST_CASE("HttpUtils parse url with port")
+{
+    auto result = HttpUtils::SplitUrl("http://localhost:8080/test/foo");
+
+    REQUIRE(result[0] == "http://");
+    REQUIRE(result[1] == "localhost");
+    REQUIRE(result[2] == "8080");
+    REQUIRE(result[3] == "/test/foo");
+}
+
