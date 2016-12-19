@@ -139,6 +139,9 @@ int SecureSocket::Receive(char *buffer, size_t length)
             buffer_.erase(buffer_.begin(), buffer_.begin() + byteCount);
             totalRead += byteCount;
         }
+
+        if (totalRead > 0)
+            break;
         else
         {
             size_t bytesReadFromSocket = Socket::Receive(socketBuffer, 1024);
