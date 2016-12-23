@@ -19,7 +19,8 @@ HttpClient::HttpClient(const string host) :
 HttpClient::HttpClient(unique_ptr<ISocket> s) :
     socket_(move(s))
 {
-    host_ = socket_->GetHost();
+    if (socket_ != nullptr && socket_->GetError() == "")
+        host_ = socket_->GetHost();
     headers_["User-Agent"] = "Legit v0";
 }
 
@@ -125,6 +126,9 @@ HttpResponse HttpClient::SendRequest(string request)
 
 HttpResponse HttpClient::Get(const string &url)
 {
+    if (socket_ == nullptr || socket_->GetError() != "")
+        return HttpResponse();
+
     ostringstream ss;
     ss << "GET " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
@@ -137,12 +141,18 @@ HttpResponse HttpClient::Get(const string &url)
 
 HttpResponse HttpClient::Post(const string &url, const vector<char> &body, const string &encoding)
 {
+    if (socket_ == nullptr || socket_->GetError() != "")
+        return HttpResponse();
+
     string bodyStr(body.begin(), body.end());
     return Post(url, bodyStr, encoding);
 }
 
 HttpResponse HttpClient::Post(const string &url, const string &body, const string &encoding)
 {
+    if (socket_ == nullptr || socket_->GetError() != "")
+        return HttpResponse();
+
     ostringstream ss;
     ss << "POST " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
@@ -159,6 +169,9 @@ HttpResponse HttpClient::Post(const string &url, const string &body, const strin
 
 HttpResponse HttpClient::Put(const string &url, const string &body, const string &encoding)
 {
+    if (socket_ == nullptr || socket_->GetError() != "")
+        return HttpResponse();
+
     ostringstream ss;
     ss << "PUT " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
@@ -175,6 +188,9 @@ HttpResponse HttpClient::Put(const string &url, const string &body, const string
 
 HttpResponse HttpClient::Delete(const string &url)
 {
+    if (socket_ == nullptr || socket_->GetError() != "")
+        return HttpResponse();
+
     ostringstream ss;
     ss << "DELETE " << url << " HTTP/1.1\r\n";
     ss << "Host: " << host_ << "\r\n";
