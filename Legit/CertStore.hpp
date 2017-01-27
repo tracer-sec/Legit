@@ -11,7 +11,6 @@ class CertStore : public Botan::Credentials_Manager
 public:
     CertStore();
     CertStore(std::string pem);
-    CertStore(std::string pem, bool validate);
 
     std::vector<Botan::Certificate_Store *> trusted_certificate_authorities(
         const std::string &type, 
@@ -26,16 +25,8 @@ public:
         const std::string &type,
         const std::string &context) override;
 
-    void verify_certificate_chain(
-        const std::string &type,
-        const std::string &purported_hostname,
-        const std::vector<Botan::X509_Certificate> &cert_chain) override;
-
-    void SetValidation(bool v) { validate_ = v; }
-
 private:
     std::vector<Botan::Certificate_Store *> certs_;
-    bool validate_;
 };
 
 } // end namespace

@@ -13,8 +13,7 @@ using namespace Legit;
 using namespace std;
 using namespace Botan;
 
-CertStore::CertStore() :
-    validate_(true)
+CertStore::CertStore()
 {
     #ifdef _WIN32
     HANDLE certStore = ::CertOpenSystemStore(NULL, L"ROOT");
@@ -65,16 +64,7 @@ CertStore::CertStore() :
     #endif
 }
 
-CertStore::CertStore(string pem) :
-    validate_(true)
-{
-    DataSource_Memory certData(pem);
-    X509_Certificate cert(certData);
-    certs_.push_back(new Certificate_Store_In_Memory(cert));
-}
-
-CertStore::CertStore(string pem, bool validate) :
-    validate_(validate)
+CertStore::CertStore(string pem)
 {
     DataSource_Memory certData(pem);
     X509_Certificate cert(certData);
@@ -109,26 +99,4 @@ Botan::Private_Key *CertStore::private_key_for(
     cout << "Getting private key for " << type << "|" << context << endl << flush;
 
     return nullptr;
-}
-
-// TODO: better handling
-void CertStore::verify_certificate_chain(
-    const std::string& type,
-    const std::string& purported_hostname,
-    const std::vector<Botan::X509_Certificate>& cert_chain)
-{
-    cout << "verify_certificate_chain " << type << "|" << purported_hostname << endl << flush;
-
-    try
-    {
-        if (validate_)
-        {
-            Credentials_Manager::verify_certificate_chain(type, purported_hostname, cert_chain);
-        }
-    }
-    catch (std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-        throw;
-    }
 }

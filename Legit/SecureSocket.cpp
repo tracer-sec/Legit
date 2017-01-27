@@ -13,10 +13,17 @@ using namespace Legit;
 using namespace std;
 using namespace std::placeholders;
 
-SecureSocket::SecureSocket(string host, string service, unique_ptr<CertStore> credentials, unsigned short timeout) :
+class RevocationNotRequiredPolicy : public Botan::TLS::Policy
+{
+public:
+    bool require_cert_revocation_info() const override { return false; }
+};
+
+SecureSocket::SecureSocket(string host, string service, unique_ptr<CertStore> credentials, unsigned short timeout, bool validate) :
     Socket(host, service, timeout),
     credentials_(move(credentials)),
-    client_(nullptr)
+    client_(nullptr),
+    validate_(validate)
 {
     if (credentials_ == nullptr)
     {
@@ -25,23 +32,20 @@ SecureSocket::SecureSocket(string host, string service, unique_ptr<CertStore> cr
 
     Botan::AutoSeeded_RNG rng;
     Botan::TLS::Session_Manager_In_Memory sessionManager(rng);
-    Botan::TLS::Policy policy;
+    RevocationNotRequiredPolicy policy;
     Botan::TLS::Server_Information server(host, service);
 
     auto version = policy.latest_supported_version(false);
 
-    auto outputFunc = std::bind(&SecureSocket::output, this, _1, _2);
-    auto dataFunc = std::bind(&SecureSocket::data, this, _1, _2);
-    auto alertFunc = std::bind(&SecureSocket::alert, this, _1, _2, _3);
-    auto sessionFunc = std::bind(&SecureSocket::session, this, _1);
-
     client_ = make_shared<Botan::TLS::Client>(
-        outputFunc, dataFunc, alertFunc, sessionFunc,
+        *this,
         sessionManager, *credentials_, policy, rng,
         server, version);
 
     cout << "application_protocol: " << client_->application_protocol() << endl << flush;
     cout << "active/closed: " << client_->is_active() << "/" << client_->is_closed() << endl << flush;
+
+    auto foo = client_->application_protocol();
 
     while (!client_->is_active() && !client_->is_closed())
     {
@@ -76,12 +80,12 @@ SecureSocket::~SecureSocket()
     client_->close();
 }
 
-void SecureSocket::output(const Botan::byte *data, size_t length)
+void SecureSocket::tls_emit_data(const uint8_t data[], size_t size)
 {
     size_t offset = 0;
-    while (offset < length)
+    while (offset < size)
     {
-        size_t sent = Socket::Send(reinterpret_cast<const char *>(data + offset), length - offset);
+        size_t sent = Socket::Send(reinterpret_cast<const char *>(data + offset), size - offset);
         if (sent == SOCKET_ERROR)
         {
             #ifdef _WIN32
@@ -93,20 +97,46 @@ void SecureSocket::output(const Botan::byte *data, size_t length)
     }
 }
 
-void SecureSocket::data(const Botan::byte *data, size_t length)
+void SecureSocket::tls_record_received(uint64_t seq_no, const uint8_t data[], size_t size)
 {
-    buffer_.insert(buffer_.end(), data, data + length);
+    buffer_.insert(buffer_.end(), data, data + size);
 }
 
-void SecureSocket::alert(Botan::TLS::Alert alert, const Botan::byte *data, size_t length)
+void SecureSocket::tls_alert(Botan::TLS::Alert alert)
 {
     cout << alert.type_string() << endl << flush;
 }
 
-bool SecureSocket::session(const Botan::TLS::Session &session)
+bool SecureSocket::tls_session_established(const Botan::TLS::Session &session)
 {
     cout << session.server_info().hostname() << endl << flush;
     return true;
+}
+
+// TODO: better handling
+void SecureSocket::tls_verify_cert_chain(
+    const vector<Botan::X509_Certificate> &cert_chain,
+    const vector<shared_ptr<const Botan::OCSP::Response>> &ocsp_responses,
+    const vector<Botan::Certificate_Store *> &trusted_roots,
+    Botan::Usage_Type usage,
+    const string &hostname,
+    const Botan::TLS::Policy &policy
+)
+{
+    cout << "verify_certificate_chain " /* << type << "|" */ << hostname << endl << flush;
+
+    try
+    {
+        if (validate_)
+        {
+            Botan::TLS::Callbacks::tls_verify_cert_chain(cert_chain, ocsp_responses, trusted_roots, usage, hostname, policy);
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        throw;
+    }
 }
 
 int SecureSocket::Send(const char *buffer, size_t length)
