@@ -115,6 +115,16 @@ TEST_CASE("string split no-split")
     REQUIRE(result[0] == "this is a test");
 }
 
+TEST_CASE("string split wide")
+{
+    vector<wstring> result = Utils::Split(L"this is a test", L" ");
+    REQUIRE(result.size() == 4);
+    REQUIRE(result[0] == L"this");
+    REQUIRE(result[1] == L"is");
+    REQUIRE(result[2] == L"a");
+    REQUIRE(result[3] == L"test");
+}
+
 TEST_CASE("wide from string")
 {
     auto result = Utils::WideFromString("This is a test");

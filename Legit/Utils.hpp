@@ -16,6 +16,7 @@ namespace Utils
     std::string FriendlySize(size_t length);
     std::string Join(std::string seperator, std::vector<std::string> stringList);
     std::vector<std::string> Split(std::string s, std::string seperator);
+    std::vector<std::wstring> Split(std::wstring s, std::wstring seperator);
     std::wstring WideFromString(const std::string &s);
     std::string StringFromWide(const std::wstring &w);
 }

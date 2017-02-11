@@ -92,9 +92,10 @@ string Utils::Join(string seperator, vector<string> stringList)
     return ss.str();
 }
 
-vector<string> Utils::Split(string s, string seperator)
+template<class T>
+vector<basic_string<T>> SplitWorker(basic_string<T> &s, basic_string<T> &seperator)
 {
-    vector<string> result;
+    vector<basic_string<T>> result;
 
     size_t start = 0;
     size_t end = s.find(seperator, 0);
@@ -108,6 +109,16 @@ vector<string> Utils::Split(string s, string seperator)
     result.push_back(s.substr(start));
 
     return result;
+}
+
+vector<string> Utils::Split(string s, string seperator)
+{
+    return SplitWorker<string::value_type>(s, seperator);
+}
+
+vector<wstring> Utils::Split(wstring s, wstring seperator)
+{
+    return SplitWorker<wstring::value_type>(s, seperator);
 }
 
 wstring Utils::WideFromString(const string &s)
