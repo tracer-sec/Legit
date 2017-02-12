@@ -140,3 +140,44 @@ string Utils::StringFromWide(const wstring &w)
     return string(w.begin(), w.end());
     #endif
 }
+
+vector<wstring> Utils::Tokenise(const wstring &s)
+{
+    vector<wstring> result;
+
+    auto split = Utils::Split(s, L" ");
+    wstring current;
+    bool insideQuote = false;
+    for (auto t : split)
+    {
+        if (!insideQuote && t[0] == '\"')
+        {
+            insideQuote = true;
+            t = t.substr(1);
+        }
+
+        if (insideQuote && t[t.length() - 1] == '\"')
+        {
+            if (t[t.length() - 2] != '\\')
+            {
+                insideQuote = false;
+                t = t.substr(0, t.length() - 1);
+                t = Utils::FindAndReplace(t, L"\\\"", L"\"");
+            }
+        }
+
+        if (insideQuote)
+        {
+            current += Utils::FindAndReplace(t, L"\\\"", L"\"") + L" ";
+            continue;
+        }
+        
+        current += t;
+
+        result.push_back(current);
+        current = L"";
+    }
+
+    return result;
+}
+

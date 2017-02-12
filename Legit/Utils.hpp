@@ -19,6 +19,7 @@ namespace Utils
     std::vector<std::wstring> Split(std::wstring s, std::wstring seperator);
     std::wstring WideFromString(const std::string &s);
     std::string StringFromWide(const std::wstring &w);
+    std::vector<std::wstring> Tokenise(const std::wstring &s);
 }
 
 } // end namespace

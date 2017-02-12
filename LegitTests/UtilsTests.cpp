@@ -130,3 +130,77 @@ TEST_CASE("wide from string")
     auto result = Utils::WideFromString("This is a test");
     REQUIRE(result == L"This is a test");
 }
+
+TEST_CASE("tokenised split")
+{
+    auto result = Utils::Tokenise(L"foo bar baz");
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == L"foo");
+    REQUIRE(result[1] == L"bar");
+    REQUIRE(result[2] == L"baz");
+}
+
+TEST_CASE("tokenised split with quotes")
+{
+    auto result = Utils::Tokenise(L"foo \"bar\" baz");
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == L"foo");
+    REQUIRE(result[1] == L"bar");
+    REQUIRE(result[2] == L"baz");
+}
+
+TEST_CASE("tokenised split with spaces inside quotes")
+{
+    auto result = Utils::Tokenise(L"foo \"bar baz\" derp");
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == L"foo");
+    REQUIRE(result[1] == L"bar baz");
+    REQUIRE(result[2] == L"derp");
+}
+
+TEST_CASE("tokenised split with spaces inside quotes start")
+{
+    auto result = Utils::Tokenise(L"\"bar baz\" derp");
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == L"bar baz");
+    REQUIRE(result[1] == L"derp");
+}
+
+TEST_CASE("tokenised split with spaces inside quotes end")
+{
+    auto result = Utils::Tokenise(L"foo \"bar baz\"");
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[0] == L"foo");
+    REQUIRE(result[1] == L"bar baz");
+}
+
+TEST_CASE("tokenised split with spaces inside quotes complete")
+{
+    auto result = Utils::Tokenise(L"\"bar baz\"");
+    REQUIRE(result.size() == 1);
+    REQUIRE(result[0] == L"bar baz");
+}
+
+TEST_CASE("tokenised split with spaces inside quotes escaped")
+{
+    auto result = Utils::Tokenise(L"foo \"bar \\\"WITH STUFF!\\\" baz\" derp");
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == L"foo");
+    REQUIRE(result[1] == L"bar \"WITH STUFF!\" baz");
+    REQUIRE(result[2] == L"derp");
+}
+
+TEST_CASE("tokenised split with escaped quotes at start")
+{
+    auto result = Utils::Tokenise(L"\"\\\"FOO BAR\\\" baz\"");
+    REQUIRE(result.size() == 1);
+    REQUIRE(result[0] == L"\"FOO BAR\" baz");
+}
+
+TEST_CASE("tokenised split with escaped quotes at end")
+{
+    auto result = Utils::Tokenise(L"\"baz \\\"FOO BAR\\\"\"");
+    REQUIRE(result.size() == 1);
+    REQUIRE(result[0] == L"baz \"FOO BAR\"");
+}
+
