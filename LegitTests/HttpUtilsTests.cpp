@@ -107,3 +107,12 @@ TEST_CASE("HttpUtils parse url with port")
     REQUIRE(result[3] == "/test/foo");
 }
 
+TEST_CASE("HttpUtils url encoding")
+{
+    auto result0 = HttpUtils::UrlEncode("foo=bar&q=wtf & forwhy?");
+    REQUIRE(result0 == "foo%3Dbar%26q%3Dwtf+%26+forwhy%3F");
+
+    auto result1 = HttpUtils::UrlEncode("http://www.example.com");
+    REQUIRE(result1 == "http%3A%2F%2Fwww.example.com");
+}
+

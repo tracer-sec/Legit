@@ -16,10 +16,12 @@ const unordered_map<string, string> URL_ENCODING = {
     { "#", "%23" },
     { "&", "%26" },
     { "/", "%2F" },
-    { "=", "%3D" }
+    { ":", "%3A" },
+    { "=", "%3D" },
+    { "?", "%3F" }
 };
 
-string UrlEncode(string s)
+string HttpUtils::UrlEncode(string s)
 {
     for (auto p : URL_ENCODING)
     {
