@@ -109,8 +109,8 @@ TEST_CASE("HttpUtils parse url with port")
 
 TEST_CASE("HttpUtils url encoding")
 {
-    auto result0 = HttpUtils::UrlEncode("foo=bar&q=wtf & forwhy?");
-    REQUIRE(result0 == "foo%3Dbar%26q%3Dwtf+%26+forwhy%3F");
+    auto result0 = HttpUtils::UrlEncode("foo=bar&q=wtf & for+why?");
+    REQUIRE(result0 == "foo%3Dbar%26q%3Dwtf%20%26%20for%2Bwhy%3F");
 
     auto result1 = HttpUtils::UrlEncode("http://www.example.com");
     REQUIRE(result1 == "http%3A%2F%2Fwww.example.com");

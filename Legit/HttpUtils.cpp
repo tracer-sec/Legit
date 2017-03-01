@@ -11,10 +11,11 @@ using namespace std;
 const unordered_map<string, string> URL_ENCODING = {
     { "\r", "%0D" },
     { "\n", "%0A" },
-    { " ", "+" },
+    { " ", "%20" },
     { "\"", "%22" },
     { "#", "%23" },
     { "&", "%26" },
+    { "+", "%2B" },
     { "/", "%2F" },
     { ":", "%3A" },
     { "=", "%3D" },
