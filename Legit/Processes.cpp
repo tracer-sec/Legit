@@ -8,6 +8,7 @@
 #else
     #include <csignal>
     #include <unistd.h>
+    #include <sys/select.h>
 #endif
 
 using namespace Legit;
@@ -136,6 +137,70 @@ string Processes::GetExecutablePath()
         return path;
 
     return path.substr(0, pos);
+}
+
+string Processes::Command(const string cmd)
+{
+    string result;
+
+    #ifdef _WIN32
+
+    // TODO
+
+    #else
+
+    const int PIPE_READ = 0;
+    const int PIPE_WRITE = 1;
+
+    string fullCommand = cmd + " 2>&1";
+
+    int in[2], out[2];
+    if (pipe(in) != 0 || pipe(out) != 0)
+        return "* ERROR CREATING PIPES";
+
+    auto pid = fork();
+    if (pid == 0)
+    {
+        // Close out pointless pipes and run command
+        close(in[PIPE_WRITE]);
+        dup2(in[PIPE_READ], PIPE_READ);
+        close(out[PIPE_READ]);
+        dup2(out[PIPE_WRITE], PIPE_WRITE);
+        execl("/bin/sh", "sh", "-c", cmd.c_str(), nullptr);
+        perror("execl");
+        exit(1);
+    }
+    else
+    {
+        // Start reading contents of stdout pipe
+        fd_set fdList;
+        FD_ZERO(&fdList);
+        FD_SET(out[PIPE_READ], &fdList);
+
+        timeval timeout;
+        timeout.tv_sec = 3;
+        timeout.tv_usec = 0;
+
+        size_t bytesRead = 1;
+        while (bytesRead > 0)
+        {
+            int ready = select(out[PIPE_READ] + 1, &fdList, nullptr, nullptr, &timeout);
+            if (ready < 1)
+            {
+                // Nothing to read after the timeout. Kill the process and bail
+                Processes::KillProcess(pid);
+                result += "Command timeout\n";
+                break;
+            }
+            vector<char> buffer(256);
+            bytesRead = read(out[PIPE_READ], &buffer[0], buffer.size());
+            result += string(&buffer[0], bytesRead);
+        }
+    }
+
+    #endif
+
+    return result;
 }
 
 #ifdef _WIN32
