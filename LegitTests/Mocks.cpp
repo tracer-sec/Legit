@@ -8,8 +8,8 @@ using namespace Legit;
 using namespace std;
 
 Mocket::Mocket(string host, string port, ostringstream &sendStream, string response) :
-    host_(host),
     sent_(sendStream),
+    host_(host),
     response_(response)
 {
 
