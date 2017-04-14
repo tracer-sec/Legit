@@ -10,8 +10,10 @@ namespace Legit
 {
     #ifdef _WIN32
         const char SEPARATOR = '\\';
+        const wchar_t SEPARATOR_WIDE = L'\\';
     #else
         const char SEPARATOR = '/';
+        const wchar_t SEPARATOR_WIDE = L'/';
 
         template<typename T, typename... Args>
         std::unique_ptr<T> make_unique(Args&&... args) {

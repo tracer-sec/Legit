@@ -1,11 +1,13 @@
 #include "FileSystem.hpp"
 #include "Utils.hpp"
+#include "Environment.hpp"
 
 #ifdef _WIN32
     #include <Windows.h>
     #include <Shlwapi.h>
 #else
     #include <dirent.h>
+    #include <unistd.h>
 #endif
 
 using namespace Legit;
@@ -39,6 +41,24 @@ vector<wstring> FileSystem::GetSubdirectories(wstring path)
     }
 
     ::FindClose(handle);
+    #else
+    string p = Utils::StringFromWide(path);
+    DIR *directory = ::opendir(p.c_str());
+    if (directory)
+    {
+        dirent *entry = ::readdir(directory);
+        while (entry != nullptr)
+        {
+            string filename(entry->d_name);
+            if (entry->d_type == DT_DIR
+                && filename != "." && filename != "..")
+            {
+                result.push_back(Utils::WideFromString(filename));
+            }
+            entry = ::readdir(directory);
+        }
+        ::closedir(directory);
+    }
     #endif
     return result;
 }
@@ -90,11 +110,11 @@ vector<wstring> FileSystem::GetFiles(wstring path)
 vector<wstring> FileSystem::ExpandWildcards(wstring pattern)
 {
     vector<wstring> result;
-    #ifdef _WIN32
-    auto wildcard = pattern.find(L"*\\");
+
+    auto wildcard = pattern.find(wstring(L"*") + Legit::SEPARATOR_WIDE);
     if (wildcard != wstring::npos)
     {
-        vector<wstring> w = GetSubdirectories(pattern.substr(0, wildcard + 1));
+        vector<wstring> w = GetSubdirectories(pattern.substr(0, wildcard));
         for (auto path : w)
         {
             // Filter out anything not a directory
@@ -109,7 +129,7 @@ vector<wstring> FileSystem::ExpandWildcards(wstring pattern)
         // Simple
         result.push_back(pattern);
     }
-    #endif
+
     return result;
 }
 
@@ -118,8 +138,9 @@ bool FileSystem::FileExists(wstring path)
     #ifdef _WIN32
     DWORD fileData = ::GetFileAttributes(path.c_str());
     return (fileData != INVALID_FILE_ATTRIBUTES && !(fileData & FILE_ATTRIBUTE_DIRECTORY));
+    #else
+    return access(Utils::StringFromWide(path).c_str(), F_OK) != -1;
     #endif
-    return false;
 }
 
 bool FileSystem::DirectoryExists(wstring path)
@@ -127,8 +148,9 @@ bool FileSystem::DirectoryExists(wstring path)
     #ifdef _WIN32
     DWORD fileData = ::GetFileAttributes(path.c_str());
     return (fileData != INVALID_FILE_ATTRIBUTES && (fileData & FILE_ATTRIBUTE_DIRECTORY));
+    #else
+    return access(Utils::StringFromWide(path).c_str(), F_OK) != -1;
     #endif
-    return false;
 }
 
 
