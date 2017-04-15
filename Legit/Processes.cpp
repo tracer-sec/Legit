@@ -11,6 +11,7 @@
     #include <unistd.h>
     #include <sys/select.h>
     #include <sys/wait.h>
+    #include <ctime>
 #endif
 
 using namespace Legit;
@@ -166,7 +167,7 @@ string Processes::Command(const string cmd)
         dup2(in[PIPE_READ], PIPE_READ);
         close(out[PIPE_READ]);
         dup2(out[PIPE_WRITE], PIPE_WRITE);
-        execl("/bin/sh", "sh", "-c", cmd.c_str(), nullptr);
+        execl("/bin/sh", "sh", "-c", fullCommand.c_str(), nullptr);
         perror("execl");
         exit(1);
     }
@@ -177,13 +178,13 @@ string Processes::Command(const string cmd)
         FD_ZERO(&fdList);
         FD_SET(out[PIPE_READ], &fdList);
 
-        timeval timeout;
-        timeout.tv_sec = 3;
-        timeout.tv_usec = 0;
-
-        size_t bytesRead = 1;
-        while (bytesRead > 0)
+        time_t startTime = time(NULL);
+        while (difftime(time(NULL), startTime) < 10)
         {
+            timeval timeout;
+            timeout.tv_sec = 3;
+            timeout.tv_usec = 0;
+
             int ready = select(out[PIPE_READ] + 1, &fdList, nullptr, nullptr, &timeout);
             if (ready <= 0)
             {
@@ -191,7 +192,7 @@ string Processes::Command(const string cmd)
             }
 
             vector<char> buffer(256);
-            bytesRead = read(out[PIPE_READ], &buffer[0], buffer.size());
+            int bytesRead = read(out[PIPE_READ], &buffer[0], buffer.size());
             result += string(&buffer[0], bytesRead);
         }
 
