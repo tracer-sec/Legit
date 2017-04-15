@@ -1,5 +1,6 @@
 #include "Processes.hpp"
 #include "Utils.hpp"
+#include "Environment.hpp"
 
 #ifdef _WIN32
     #include <Windows.h>
@@ -9,6 +10,7 @@
     #include <csignal>
     #include <unistd.h>
     #include <sys/select.h>
+    #include <sys/wait.h>
 #endif
 
 using namespace Legit;
@@ -121,18 +123,16 @@ string Processes::GetExecutablePath()
     DWORD length = ::GetModuleFileName(NULL, buffer, MAX_PATH + 1);
     wstring widePath(&buffer[0], length);
     string path = Utils::StringFromWide(widePath);
-    char SEPERATOR = '\\';
 
     #else
 
     char pathBuffer[1025] = { 0 };
     readlink("/proc/self/exe", pathBuffer, 1024);
     string path(pathBuffer);
-    char SEPERATOR = '/';
 
     #endif
 
-    auto pos = path.find_last_of(SEPERATOR);
+    auto pos = path.find_last_of(Legit::SEPARATOR);
     if (pos == string::npos)
         return path;
 
@@ -185,16 +185,27 @@ string Processes::Command(const string cmd)
         while (bytesRead > 0)
         {
             int ready = select(out[PIPE_READ] + 1, &fdList, nullptr, nullptr, &timeout);
-            if (ready < 1)
+            if (ready <= 0)
             {
-                // Nothing to read after the timeout. Kill the process and bail
-                Processes::KillProcess(pid);
-                result += "Command timeout\n";
                 break;
             }
+
             vector<char> buffer(256);
             bytesRead = read(out[PIPE_READ], &buffer[0], buffer.size());
             result += string(&buffer[0], bytesRead);
+        }
+
+        int status;
+        if (waitpid(pid, &status, WNOHANG) == 0
+            || !WIFEXITED(status))
+        {
+            Processes::KillProcess(pid);
+            waitpid(pid, &status, 0);
+            result += "*** Command timeout\n";
+        }
+        else
+        {
+            result += "*** DONE\n";
         }
     }
 
