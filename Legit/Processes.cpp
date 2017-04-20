@@ -1,6 +1,7 @@
 #include "Processes.hpp"
 #include "Utils.hpp"
 #include "Environment.hpp"
+#include <ctime>
 
 #ifdef _WIN32
     #include <Windows.h>
@@ -11,7 +12,6 @@
     #include <unistd.h>
     #include <sys/select.h>
     #include <sys/wait.h>
-    #include <ctime>
 #endif
 
 using namespace Legit;
@@ -146,7 +146,92 @@ string Processes::Command(const string cmd)
 
     #ifdef _WIN32
 
-    // TODO
+    STARTUPINFO startupInfo;
+    PROCESS_INFORMATION processInfo;
+    SECURITY_ATTRIBUTES securityAttributes;
+
+    ::ZeroMemory(&startupInfo, sizeof(startupInfo));
+    ::ZeroMemory(&processInfo, sizeof(processInfo));
+    ::ZeroMemory(&securityAttributes, sizeof(securityAttributes));
+
+    securityAttributes.nLength = sizeof(securityAttributes);
+    securityAttributes.lpSecurityDescriptor = NULL;
+    securityAttributes.bInheritHandle = TRUE;
+
+    HANDLE inRead, inWrite, inWriteTemp;
+    HANDLE outRead, outWrite, outReadTemp;
+    HANDLE errorWrite;
+    auto pipeResult = ::CreatePipe(&inRead, &inWriteTemp, &securityAttributes, 0);
+    pipeResult = ::CreatePipe(&outReadTemp, &outWrite, &securityAttributes, 0);
+
+    HANDLE currentProcess = GetCurrentProcess();
+    pipeResult = ::DuplicateHandle(currentProcess, outWrite, currentProcess, &errorWrite, 0, TRUE, DUPLICATE_SAME_ACCESS);
+
+    pipeResult = ::DuplicateHandle(currentProcess, outReadTemp, currentProcess, &outRead, 0, FALSE, DUPLICATE_SAME_ACCESS);
+    pipeResult = ::DuplicateHandle(currentProcess, inWriteTemp, currentProcess, &inWrite, 0, FALSE, DUPLICATE_SAME_ACCESS);
+
+    pipeResult = ::CloseHandle(outReadTemp);
+    pipeResult = ::CloseHandle(inWriteTemp);
+
+    startupInfo.cb = sizeof(startupInfo);
+    startupInfo.dwFlags = STARTF_USESTDHANDLES;
+    startupInfo.hStdOutput = outWrite;
+    startupInfo.hStdInput = inRead;
+    startupInfo.hStdError = errorWrite;
+
+    auto error = ::GetLastError();
+
+    wstring fullCommand(L"/c " + Utils::WideFromString(cmd) + L" 2>&1");
+    vector<wchar_t> derp(fullCommand.begin(), fullCommand.end());
+    derp.push_back(0);
+    auto processResult = ::CreateProcess(L"c:\\windows\\system32\\cmd.exe", derp.data(), NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &startupInfo, &processInfo);
+
+    error = ::GetLastError();
+
+    ::CloseHandle(processInfo.hThread);
+
+    ::CloseHandle(outWrite);
+    ::CloseHandle(inRead);
+    ::CloseHandle(errorWrite);
+
+    CHAR buffer[1024];
+    DWORD bytesRead = 0;
+    time_t startTime = ::time(NULL);
+    while (difftime(time(NULL), startTime) < 10)
+    {
+        ::Sleep(3000);
+        DWORD bytesAvailable;
+        auto peek = ::PeekNamedPipe(outRead, NULL, 0, NULL, &bytesAvailable, NULL);
+        if (bytesAvailable == 0)
+        {
+            result += "*** Command timeout\n";
+            break;
+        }
+        auto readResult = ::ReadFile(outRead, buffer, sizeof(buffer), &bytesRead, NULL);
+        if (!readResult || !bytesRead)
+        {
+            if (GetLastError() == ERROR_BROKEN_PIPE)
+                break;
+        }
+
+        result += string(buffer, bytesRead);
+    }
+
+    DWORD exitCode;
+    ::GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
+    if (exitCode == STILL_ACTIVE)
+    {
+        Processes::KillProcess(processInfo.dwProcessId);
+        result += "*** Command timeout\n";
+    }
+    else
+    {
+        result += "*** DONE";
+    }
+
+    ::CloseHandle(outRead);
+    ::CloseHandle(inWrite);
 
     #else
 
