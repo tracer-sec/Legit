@@ -204,3 +204,15 @@ TEST_CASE("tokenised split with escaped quotes at end")
     REQUIRE(result[0] == L"baz \"FOO BAR\"");
 }
 
+TEST_CASE("string to wide conversion 0")
+{
+    auto result = Utils::WideFromString("this is a test!");
+    REQUIRE(result == L"this is a test!");
+}
+
+TEST_CASE("wide to string conversion 0")
+{
+    auto result = Utils::StringFromWide(L"this is a test!");
+    REQUIRE(result == "this is a test!");
+}
+
