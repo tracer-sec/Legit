@@ -2,10 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
-
-#ifdef _WIN32
 #include <codecvt>
-#endif
 
 using namespace Legit;
 using namespace std;
@@ -123,22 +120,14 @@ vector<wstring> Utils::Split(wstring s, wstring seperator)
 
 wstring Utils::WideFromString(const string &s)
 {
-    #ifdef _WIN32
     wstring_convert<codecvt_utf8<wchar_t>> converter;
     return converter.from_bytes(s);
-    #else
-    return wstring(s.begin(), s.end());
-    #endif
 }
 
 string Utils::StringFromWide(const wstring &w)
 {
-    #ifdef _WIN32
     wstring_convert<codecvt_utf8<wchar_t>> converter;
     return converter.to_bytes(w);
-    #else
-    return string(w.begin(), w.end());
-    #endif
 }
 
 vector<wstring> Utils::Tokenise(const wstring &s)
