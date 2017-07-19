@@ -20,6 +20,7 @@ namespace Processes
     bool KillProcess(int processId);
     std::string GetExecutablePath();
     std::string Command(const std::string cmd);
+    void Execute(const std::string path);
     
     #ifdef _WIN32
     bool Inject(std::wstring path, unsigned int processId);

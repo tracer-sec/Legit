@@ -300,6 +300,37 @@ string Processes::Command(const string cmd)
     return result;
 }
 
+#ifndef _WIN32
+
+// SIGCHLD catcher for child processes
+void SigChild(int unused)
+{
+    int status;
+    waitpid(-1, &status, 0); 
+}
+
+#endif
+
+void Processes::Execute(const string path)
+{
+    #ifdef _WIN32
+
+    // TODO
+
+    #else
+
+    signal(SIGCHLD, SigChild);
+
+    auto pid = fork();
+    if (pid == 0)
+    {
+        execl(path.c_str(), "", nullptr);
+        exit(0);
+    }
+
+    #endif
+}
+
 #ifdef _WIN32
 
 bool Processes::Inject(wstring path, unsigned int processId)
