@@ -153,4 +153,12 @@ bool FileSystem::DirectoryExists(wstring path)
     #endif
 }
 
+wstring FileSystem::GetTempPath()
+{
+    #ifdef _WIN32
+    // TODO
+    #else
+    return L"/tmp";
+    #endif
+}
 
