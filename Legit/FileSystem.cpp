@@ -1,4 +1,3 @@
-#include "FileSystem.hpp"
 #include "Utils.hpp"
 #include "Environment.hpp"
 
@@ -10,8 +9,13 @@
     #include <unistd.h>
 #endif
 
+// Unconventional include order, because Win32 loves its stupid macro bullshit
+#include "FileSystem.hpp"
+
 using namespace Legit;
 using namespace std;
+
+FILETIME ConvertToFileTime(time_t t);
 
 vector<wstring> FileSystem::GetSubdirectories(wstring path)
 {
@@ -156,9 +160,50 @@ bool FileSystem::DirectoryExists(wstring path)
 wstring FileSystem::GetTempPath()
 {
     #ifdef _WIN32
-    // TODO
+    DWORD bufferLength = MAX_PATH;
+    TCHAR path[MAX_PATH];
+    ::GetTempPathW(bufferLength, path);
+    return wstring(path);
     #else
     return L"/tmp";
     #endif
 }
 
+bool FileSystem::SetFileDates(wstring path, time_t createdDate, time_t modifiedDate, time_t accessedDate)
+{
+    bool success = false;
+
+    HANDLE fileHandle = ::CreateFile(path.c_str(), FILE_WRITE_ATTRIBUTES, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (fileHandle != INVALID_HANDLE_VALUE)
+    {
+        FILETIME *creationTimePtr = nullptr;
+        FILETIME creationTime = ConvertToFileTime(createdDate);
+        FILETIME *accessedTimePtr = nullptr;
+        FILETIME accessedTime = ConvertToFileTime(accessedDate);
+        FILETIME *modifiedTimePtr = nullptr;
+        FILETIME modifiedTime = ConvertToFileTime(modifiedDate);
+
+        if (createdDate > 0)
+            creationTimePtr = &creationTime;
+        if (accessedDate > 0)
+            accessedTimePtr = &accessedTime;
+        if (modifiedDate > 0)
+            modifiedTimePtr = &modifiedTime;
+
+        success = ::SetFileTime(fileHandle, creationTimePtr, accessedTimePtr, modifiedTimePtr) == TRUE;
+        ::CloseHandle(fileHandle);
+    }
+
+    return success;
+}
+
+// Stolen from MSDN
+// https://msdn.microsoft.com/library/windows/desktop/ms724228%28v=vs.85%29.aspx
+FILETIME ConvertToFileTime(time_t t)
+{
+    LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
+    FILETIME result;
+    result.dwLowDateTime = (DWORD)ll;
+    result.dwHighDateTime = ll >> 32;
+    return result;
+}

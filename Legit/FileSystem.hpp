@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#undef GetTempPath // Fuck you, Win32
+
 namespace Legit
 {
 
@@ -14,6 +16,7 @@ namespace FileSystem
     bool FileExists(std::wstring path);
     bool DirectoryExists(std::wstring path);
     std::wstring GetTempPath();
+    bool SetFileDates(std::wstring path, time_t createdDate, time_t modifiedDate, time_t accessedDate);
 }
 
 } // end namespace

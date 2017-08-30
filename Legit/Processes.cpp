@@ -315,7 +315,14 @@ void Processes::Execute(const string path)
 {
     #ifdef _WIN32
 
-    // TODO
+    STARTUPINFO startupInfo;
+    PROCESS_INFORMATION processInfo;
+
+    ::ZeroMemory(&startupInfo, sizeof(startupInfo));
+    ::ZeroMemory(&processInfo, sizeof(processInfo));
+    startupInfo.cb = sizeof(startupInfo);
+
+    ::CreateProcess(Utils::WideFromString(path).c_str(), L"", NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &startupInfo, &processInfo);
 
     #else
 
