@@ -21,8 +21,8 @@ public:
 
 SecureSocket::SecureSocket(string host, string service, unique_ptr<CertStore> credentials, unsigned short timeout, bool validate) :
     Socket(host, service, timeout),
-    credentials_(move(credentials)),
     client_(nullptr),
+    credentials_(move(credentials)),
     validate_(validate)
 {
     if (credentials_ == nullptr)
