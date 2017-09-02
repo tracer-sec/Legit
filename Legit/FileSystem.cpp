@@ -7,6 +7,7 @@
 #else
     #include <dirent.h>
     #include <unistd.h>
+    #include <sys/time.h>
 #endif
 
 // Unconventional include order, because Win32 loves its stupid macro bullshit
@@ -208,7 +209,12 @@ bool FileSystem::SetFileDates(wstring path, time_t createdDate, time_t modifiedD
         ::CloseHandle(fileHandle);
     }
     #else
-    // TODO: Linux implementation
+    timeval t[2];
+    t[0].tv_sec = accessedDate;
+    t[0].tv_usec = 0;
+    t[1].tv_sec = modifiedDate;
+    t[1].tv_usec = 0;
+    success = ::utimes(Utils::StringFromWide(path).c_str(), t) == 0;
     #endif
 
     return success;
