@@ -8,6 +8,7 @@
     #include "DataLoader.hpp"
 #endif
 #include <iostream>
+#include <botan/data_src.h>
 
 using namespace Legit;
 using namespace std;
