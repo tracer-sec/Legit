@@ -20,9 +20,9 @@ TESTS=$(BINDIR)/LegitTests
 all: setup $(LIB) $(TESTS)
 
 $(LIB): $(OBJECTS) ; $(AR) $(ARFLAGS) $(LIB) $(OBJECTS)
-$(TESTS): $(LIB) $(TESTOBJECTS) ; $(CC) $(LDFLAGS) $(TESTOBJECTS) -o $@ -L$(BINDIR) -L../../lib/Botan-2.4.0 -llegit -lbotan-2 -lX11 -lz -lpng
+$(TESTS): $(LIB) $(TESTOBJECTS) ; $(CC) $(LDFLAGS) $(TESTOBJECTS) -o $@ -L$(BINDIR) -L../../lib/botan-2.9.0 -llegit -lbotan-2 -lX11 -lz -lpng
 
-$(OBJDIR)/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../../lib/Botan-2.4.0/build/include
+$(OBJDIR)/$(SRCDIR)/%.o: $(SRCDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -I../../lib/botan-2.9.0/build/include
 $(OBJDIR)/$(TSTDIR)/%.o: $(TSTDIR)/%.cpp ; $(CC) $(CFLAGS) -o $@ $< -ILegit
 
 clean: ; rm -f $(BINDIR)/* $(OBJDIR)/$(SRCDIR)/* $(OBJDIR)/$(TSTDIR)/*
